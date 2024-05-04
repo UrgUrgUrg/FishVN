@@ -1,20 +1,19 @@
 init python:
-
-##Define a special lure that your character can gift to the player to chat with them any time
-    Lantern = Lure("Lantern fish fish lantern")
-
 ##Define your characters stats, height and weight slightly contribute to their difficulty in the fishing game 
+##lureTraits is a list of traits that fishing lures can have that will attract your character
+##giftTraits is a list of traits gifts can ahve taht will increase your character's affection bar - valid traits are TBD 
+
     Lophi = Fish(
         name="Lophi",
+        description="Somewhat guarded lantern fish.",
         weight=400,
-        dateable=True,
         height=5.7,
-        lureTraits = ["normal","horny","cool","crappy"],
+        dateable=True,
+        lureTraits = ["normal","horny","cool"],
         giftTraits = ["edible","sentimental"],
-        specialLure = Lantern
-        )
-
-    ##Without this line of code your character won't show up in the game so pls don't delete:
+        specialLure = "Lantern fish fish lantern"
+    )
+    ##This next bit's super important, make sure your character's name gets changed here
     characters.append(Lophi)
 
 ##Define what colour your character's name has

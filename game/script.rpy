@@ -26,7 +26,8 @@ init -5 python:
             self.stage=0
             self.lureTraits = lureTraits
             self.giftTraits = giftTraits
-            self.specialLure = specialLure
+            if (specialLure != None):
+                self.specialLure = Lure(specialLure,"A lure that can be used to instantly catch "+name)
             if dateable:
                 self.negativeTraits = negativeTraits
             else:
@@ -73,6 +74,12 @@ init -5 python:
         currentCharacter.affectionLevel += num
         renpy.call_screen("affectionIncrease")
 
+    def obtainSpecialLure():
+        playersLures.addItem(currentCharacter.specialLure)
+        currentLure = currentCharacter.specialLure
+        renpy.call("get_lure")
+
+
     ## Instantiate our `Inventory` class for reusability
     inventory = Inventory()
 
@@ -115,6 +122,15 @@ init -5 python:
 
 ## Our flag, whether or not we are casting our fish... rod... I don't know, I don't fish.
 default casting = False
+
+label get_lure:
+    play sound "SFX/getItem.ogg"
+    show lure at topleft
+    with easeinleft
+    "Obtained [currentLure.name]"
+    hide lure
+    with dissolve
+    
 
 transform fadeAway:
     align (0.5,0.5) alpha 1.0
