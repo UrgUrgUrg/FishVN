@@ -2,9 +2,7 @@
 errors listed below, and try again.
 
 
-File "game/Character_Template.rpy", line 63: expected statement.
-    setStage(1)
-               ^
+File "game/Character_Template.rpy", line 61: Indentation mismatch.
 
 Ren'Py Version: Ren'Py 8.2.1.24030407
-Sun May  5 17:20:01 2024
+Sun May  5 17:36:31 2024

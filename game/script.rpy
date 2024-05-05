@@ -39,12 +39,19 @@ init -5 python:
 
     caught_times = 1
     affection_level = 2
+    weight = 3
+    stage = 4
+    variant = 4
 
     def character_trait(traitToGet):
         if traitToGet==caught_times:
             return currentCharacter.caughtTimes
         elif traitToGet==affection_level:
             return currentCharacter.affectionLevel
+        elif traitToGet==weight:
+            return currentCharacter.weight
+        elif traitToGet==stage:
+            return currentCharacter.stage
 
     class Lure:
         def __init__(self, name, description="A lure", uses=0, traits=["normal"], price=0):
