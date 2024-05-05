@@ -11,7 +11,7 @@ init python:
         dateable=True,
         lureTraits = ["normal","horny","cool"],
         giftTraits = ["edible","sentimental"],
-        specialLure = "Lantern fish fish lantern"
+        specialLure = "Lantern fish fish lantern",
         creator="UrgUrgUrg",
         creatorUrl="https://crayondrawlings.neocities.org",
     )
@@ -60,7 +60,7 @@ label Lophi_Catch:
     ### heres' how you can your character to progress to a new visual stage
     ### This will make Lophi use her Lophi_1.png image instead of Lophi.png
     if (character_trait(affection_level)>10):
-        setStage(1)
+        $setStage(1)
     ####
     return
 
