@@ -57,10 +57,18 @@ label Lophi_Catch:
             lophi "Sup holmes"
             $clearExpression()     # simple function to reset character's expression string to ""
             ####
-    ### heres' how you can your character to progress to a new visual stage
-    ### This will make Lophi use her Lophi_1.png image instead of Lophi.png
-    if (character_trait(affection_level)>10):
-        $setStage(1)
+
+        if (character_trait(affection_level)>10):
+            if not lophiGotFat:
+                ### ^ checking a variable we defined at the top
+                $lophiGotFat=True
+                    ### ^  then setting it to true so the below code only happens once
+                $setStage(1)
+                    ### ^ heres' how you can your character to progress to a new visual stage
+                    ### This will make Lophi use her Lophi_1.png image instead of Lophi.png
+                $increaseWeight(20)
+                    ## ^ just for fun, change the character's weight stat, very slightly
+                    ## affecting how they play in the minigame (can also use minus value)
     ####
     return
 

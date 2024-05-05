@@ -21,7 +21,7 @@ init python:
         else:
             stringo = "Characters/JunkFish/[currentCharacter.name]"
         if currentStage > 0:
-            stringo = stringo + "_" + currentStage
+            stringo = stringo + "_" + str(currentStage)
             if currentExpression != "":
                 stringo = stringo + "_" + currentExpression
         stringo = stringo + ".png"
@@ -36,6 +36,9 @@ init python:
 
     def clearExpression():
         currentExpression=""
+
+    def increaseWeight(number):
+        currentCharacter.weight = currentCharacter.weight + number
 
     def lureCode(st,at):
         if (currentLure):
