@@ -6,6 +6,7 @@
 
 image bg lake = "BG/lake.jpg"
 image bg hut = "BG/hut.jpg"
+image bg market = "BG/market.jpg"
 
 define You = Character("You",color="#ffffff")
 define Ara = Character("Ara",color="#a81515")
@@ -33,6 +34,9 @@ init python:
     def setExpression(string):
         currentExpression=string
 
+    def clearExpression():
+        currentExpression=""
+
     def lureCode(st,at):
         if (currentLure):
             return currentLure.image, None
@@ -43,7 +47,7 @@ init python:
 ##time of day system
 init -6 python:
     seconds = 21560
-    
+
     def timeCode(sec):
         sec = sec % (24 * 3600)
         hour = sec // 3600

@@ -12,7 +12,7 @@ init -5 python:
     ## Defining a `Fish` class with name, weight, height, and price of the fish.
     ## Price of the fish is equivalent to the weight divided by 2 times the height
     class Fish:
-        def __init__(self, name, weight, height, description="This dumb fish isn't sexy AT ALL", dateable=True, lureTraits=["normal"], giftTraits=[], specialLure=None, negativeTraits=["crappy"]):
+        def __init__(self, name, weight, height, description="This dumb fish isn't sexy AT ALL", dateable=True, lureTraits=["normal"], giftTraits=[], specialLure=None, negativeTraits=["crappy"],creator="",creatorUrl=""):
             self.name = name
             if (dateable):
                 self.weight = weight
@@ -34,6 +34,8 @@ init -5 python:
                 self.negativeTraits = []
             self.caughtTimes = 0
             self.affectionLevel = 0
+            self.creator = creator
+            self.creatorUrl = creatorUrl
 
     caught_times = 1
     affection_level = 2
@@ -189,7 +191,7 @@ label hut:
     menu:
         "Go to town":
             $advanceMinutes(10)
-            jump lakeside
+            jump town
         "Walk down to the lake":
             $advanceMinutes(15)
             jump lakeside
@@ -208,6 +210,9 @@ init:
     $blackMarketUnlocked=False
 
 label town:
+    play music "market.ogg"
+    scene bg market
+    with dissolve
     menu:
         "Around you are several market stalls"
         "Go back home":

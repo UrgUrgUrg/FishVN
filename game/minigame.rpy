@@ -209,6 +209,8 @@ label fishing:
             fishWeight = currentCharacter.weight
             fishSpeed = max(3,currentCharacter.weight/20)
             charName = currentCharacter.name
+            currentExpression = ""
+            currentStage = currentCharacter.stage
         "You cast your line{w=0.2}.{w=0.2}.{w=0.3}.{w=0.3}.{w=0.4}.\nA bite!"
     menu:
         "This catch seems about [currentCharacter.weight] lbs"
@@ -221,7 +223,7 @@ label fishing:
 
 transform throwback:
     transform_anchor True anchor(0.5, 0.5) rotate 0 xzoom 1.0 yzoom 1.0 xoffset 0 yoffset 0
-    ease 1.0 yoffset -600 xzoom 0.5 yzoom 0.5 rotate 700
+    linear 1.0 yoffset -600 xzoom 0.5 yzoom 0.5 rotate 700
     ease 1.0 yoffset 500 xzoom 0.0 yzoom 0.0 rotate 700
 
 

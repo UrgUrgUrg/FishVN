@@ -12,6 +12,8 @@ init python:
         lureTraits = ["normal","horny","cool"],
         giftTraits = ["edible","sentimental"],
         specialLure = "Lantern fish fish lantern"
+        creator="UrgUrgUrg",
+        creatorUrl="https://crayondrawlings.neocities.org",
     )
     ## This next bit's super important as it adds them to the game's characters, make sure your character's name gets added in place of 'Lophi' here
     characters.append(Lophi)
@@ -22,7 +24,12 @@ define lophi = Character("Lophi",color="#51cfc9")
 ## These 'labels' are where your content will be written, their naming convention is important!
 ## they also all need to end in 'return'
 
+init:
+    $lophiGotFat=False
+##feel free to define other varaibles you wnat to keep track of
+
 label Lophi_Catch:
+
     ## 'caught_times' will incement whenever the player catches your character.
     ## You acn check this value like so:SS
     if (character_trait(caught_times)==1):
@@ -44,7 +51,17 @@ label Lophi_Catch:
     elif (character_trait(affection_level) < 20):
             lophi "What you bothering me for this time? It better be either to feed me or rub my fins"
     elif (character_trait(affection_level) < 20):
+            ## here's how to set expressions, now Lophi will use Lophi_happy.png and Lophi_1_happy.png
+            ## instead of Lophi.png or Lophi_1.png
+            $setExpression("happy")
             lophi "Sup holmes"
+            $clearExpression()     # simple function to reset character's expression string to ""
+            ####
+    ### heres' how you can your character to progress to a new visual stage
+    ### This will make Lophi use her Lophi_1.png image instead of Lophi.png
+    if (character_trait(affection_level)>10):
+        setStage(1)
+    ####
     return
 
 label Lophi_AcceptGift:
@@ -54,6 +71,7 @@ label Lophi_AcceptGift:
     elif (character_trait(affection_level)<20):
         lophi "A'ight. You a suck-up but you cute with it."
     else:
+        $setExpression("happy")
         lophi "Maybe you do know how to show a girl a good time. Here why don'tchu have this..."
         ## This function will allow you to make your character give the player their 'talk to any time' lure
         $obtainSpecialLure()
