@@ -78,8 +78,15 @@ transform rodrot:
 transform slowzoom:
     xysize (500,500)
     ease 3.0 xysize (700,700)
-      
 
+transform struggle:
+    rotate 0
+    ease 0.2 rotate 40
+    ease 0.2 rotate 0
+    ease 0.2 rotate -40
+    ease 0.2 rotate 0
+    repeat
+      
 
 screen minigame:
     #variables
@@ -95,7 +102,7 @@ screen minigame:
     on "show" action SetVariable("fishDepth",1100)
     #graphics
     on "show" action Play("sound","SFX/HitWater.ogg"), Play("music","Reggae.ogg")
-    add DynamicDisplayable(characterCode) at vibrate:
+    add DynamicDisplayable(characterCode) at struggle:
         anchor(0.5,0.2)
         xpos round(fishX)
         ypos round(fishDepth)
@@ -150,7 +157,6 @@ screen minigame:
     timer 0.5 action If(fishDepth>2000,Show("failGame"),NullAction()) repeat True
     timer 0.5 action If(fishDepth<5,Show("winGame"),NullAction()) repeat True
     
-
 screen failGame:
     ## When this screen is shown, we hide our mini-game, because the player has already failed at this point! Also resets casting flag to False
     on "show" action Hide("minigame")
@@ -180,6 +186,8 @@ label fishing_start:
         python:
             datingPool=[]
             for c in characters:
+                if c in caughtToday:
+                    continue
                 for t in c.lureTraits:
                     for lt in currentLure.traits:
                         if t==lt:
@@ -191,9 +199,9 @@ label fishing_start:
 
 label fishing:
     play sound "SFX/cast.ogg"
+    $advanceMinutes(10)
     if (len(datingPool) < 1):
-        "You cast your line{w=0.2}.{w=0.2}.{w=0.3}.{w=0.3}.{w=0.4}.\nBut nothing else seems to be biting today."
-        $endOfDay=True
+        "You cast your line{w=0.2}.{w=0.2}.{w=0.3}.{w=0.3}.{w=0.4}.\nBut nothing else seems to be biting today. Maybe they're tired of this lure..."
         jump fishingMenu
     else:
         python:
@@ -211,9 +219,15 @@ label fishing:
         "End fishing":
             jump fishingMenu
 
+transform throwback:
+    transform_anchor True anchor(0.5, 0.5) rotate 0 xzoom 1.0 yzoom 1.0 xoffset 0 yoffset 0
+    ease 1.0 yoffset -600 xzoom 0.5 yzoom 0.5 rotate 700
+    ease 1.0 yoffset 500 xzoom 0.0 yzoom 0.0 rotate 700
+
 
 label caught_character:
     $currentCharacter.caughtTimes += 1
+    $caughtToday.append(currentCharacter)
     $talkedTo=False
     $givenGift=False
     show character at top
@@ -222,13 +236,19 @@ label caught_character:
         "Talk with [charName]" if not talkedTo:
             $talkedTo=True
             if (currentCharacter.dateable == True):
-                call expression charName+"_Catch" from _call_expression
+                if renpy.has_label(charName+"_Catch"):
+                    call expression charName+"_Catch"
+                else:
+                    "You and [charName] chat for a while."
                 jump char_menu
             else:
                 jump blubtalk
         "Give [charName] a gift" if (currentCharacter.dateable == True) and not givenGift:
             $givenGift=True
-            call expression charName+"_AcceptGift" from _call_expression_1
+            if renpy.has_label(charName+"_AcceptGift"):
+                call expression charName+"_AcceptGift" 
+            else:
+                "You offer [charName] a gift"
             "[charName] has accepted your gift"
             $increase_affection(3)
             jump char_menu
@@ -238,7 +258,13 @@ label caught_character:
             $getFish()
             jump fishingMenu
         "Throw [charName] back":
+            play sound "SFX/whoosh.ogg"
+            show character at throwback
+            pause 2.0
             play sound "SFX/splash.ogg"
+            hide character
+            if renpy.has_label(charName+"_ThrownBack"):
+                call expression charName+"_ThrownBack"
             jump end_converstion
 
 label end_converstion:

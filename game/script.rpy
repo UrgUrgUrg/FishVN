@@ -83,10 +83,6 @@ init -5 python:
     ## Instantiate our `Inventory` class for reusability
     inventory = Inventory()
 
-    playersLures = Inventory()
-    baitshopsLures = Inventory()
-
-
     ##JUNK FISH
     Trout = Fish("Trout",2.0,2.0,dateable=False)
     Perch = Fish("Perch",2.0,2.0,dateable=False)
@@ -101,7 +97,17 @@ init -5 python:
     #fill the character pool with a bunch of junk fish
     characters = [Trout,Trout,Perch,Perch,Trout,Clownfish]
 
+    #this will be what's avaible to the player to catch when they start fishing (based on lure used)
     datingPool = []
+    caughtToday = []
+
+    ##players starting lures
+    playersLures = Inventory()
+    playersLures.items = [Hook]
+
+    ##bait shop's starting lures
+    baitshopsLures = Inventory()
+    baitshopsLures.items = [Minnow,HulaGirl,GraphicRasta]
 
     ## Method to generate a random fish from our 3 pools of possible fishes AND add it to our inventory in one go.
     ## To make a new fish, simply:
@@ -133,6 +139,7 @@ label get_lure:
     "Obtained [currentLure.name]"
     hide lure
     with dissolve
+    return
     
 
 transform fadeAway:
@@ -157,7 +164,17 @@ transform vibrate:
 transform dontvibrate:
     rotate 0
 
+label clockTest:
+    "The time is [timeCode(seconds)]"
+    menu:
+        "wait ten minutes":
+            $advanceMinutes(10)
+        "wait an hour":
+            $advanceHours(1)
+    jump clockTest
+
 label start:
+    show screen clock
     $playersLures.addItem(Hook)
     $playersLures.addItem(GraphicRasta)
     $playersLures.addItem(HulaGirl)
@@ -171,30 +188,65 @@ label hut:
     with dissolve
     menu:
         "Go to town":
+            $advanceMinutes(10)
             jump lakeside
         "Walk down to the lake":
+            $advanceMinutes(15)
             jump lakeside
         "Go to bed":
             scene black
             with dissolve
+            $seconds = 21560
             $endOfDay=False
             $datingPoolSet=False
+            $caughtToday=[]
             "Your bookie always told you you'd end up sleeping with the fishes one day..."
             scene hut
             with dissolve
+
+init:
+    $blackMarketUnlocked=False
+
+label town:
+    menu:
+        "Around you are several market stalls"
+        "Go back home":
+            $advanceMinutes(10)
+            jump hut
+        "Vist the bait stall":
+            jump baitShop
+        "Visit the gift stall":
+            jump giftShop
+        "Visit the black market" if blackMarketUnlocked:
+            jump blackMarket
+        "Sell your catches":
+            jump fishShop
+        "Walk to the lake":
+            $advanceMinutes(5)
+            jump lakeside
+
+init:
+    $rememberLure = 0
 
 label fishingMenu:
     show lure at topleft
     with easeinleft
     menu fishing_menu:
         "Select your lure":
+            $advanceMinutes(10)
             hide lure
             with easeinleft
             call screen lure_select
             $currentLure = playersLures.items[_return]
-            "You have equipped [currentLure.name]"
+            if (rememberLure != _return):
+                $remberLure = _return
+                $datingPoolSet=False
+                "You have equipped [currentLure.name]"
+            else:
+                "You decided to stick with [currentLure.name]"
             jump fishingMenu
         "Put fishing rod away":
+            $advanceMinutes(20)
             play sound "SFX/closechest.ogg"
             jump lakeside
         "{color=#43f2ff}{size=+20}{b}Start Fishing{/b}{size=-20}" if not endOfDay:
@@ -206,30 +258,37 @@ label lakeside:
     with dissolve
     menu:
         "Unpack your fishing rod":
+            $advanceMinutes(20)
             play sound "SFX/setup.ogg"
             jump fishingMenu
-        "Walk back to town":
-            return
+        "Return home":
+            $advanceMinutes(15)
+            jump hut
+        "Walk to town":
+            $advanceMinutes(5)
+            jump town
 
 
-
-
-screen lure_select:
-    default activeButton = 0
+screen lure_select(shop = False):
+    default activeButton = rememberLure
+    default lureList = playersLures.items
+    on "show" action If(shop,SetScreenVariable("lureList",baitshopsLures.items),SetScreenVariable("lureList",playersLures.items))
     frame align (0.9,0.5) xysize (600,800) padding(30,30):
         viewport draggable True:
             vbox:
-                text playersLures.items[activeButton].name size 60 xalign(0.5) color("#89deff")
-                text playersLures.items[activeButton].description
+                text lureList[activeButton].name size 60 xalign(0.5) color("#89deff")
+                text lureList[activeButton].description
                 null height 20
+                if shop:
+                    text "$"+ lureList[activeButton].price size 40 color("#d0ff28")
     frame align (0.2,0.5) xysize (900,800):
         vbox:                    
             text "Owned Lures..."
             viewport draggable True mousewheel True:
                 grid 2 3 xalign(0.5):
-                    for i, numeral index numeral in enumerate(playersLures.items):
-                        $imageString = playersLures.items[i].image
-                        $textString = playersLures.items[i].name
+                    for i, numeral index numeral in enumerate(lureList):
+                        $imageString = lureList[i].image
+                        $textString = lureList[i].name
                         button action Return(i),Hide("lure_select") hovered SetScreenVariable("activeButton",i):
                             vbox:
                                 if (activeButton==i):
@@ -238,3 +297,22 @@ screen lure_select:
                                     add "[imageString]" at dontvibrate
                                 text "[textString]"  xalign(0.5)
 
+label baitShop:
+    Baitshop "Welcome to De Bait Club, mon. We'll help you catch the fish of your dreams."
+    jump baitshopMenu
+
+label baitshopMenu:
+    menu:
+        "Browse her wares":
+            call lure_select(shop=True)
+            "You chose [baitshopsLures.items[_return]]"
+        "Leave De Bait Club"
+
+label giftShop:
+    jump town
+
+label fishShop:
+    jump town
+
+label blackMarket:
+    jump town

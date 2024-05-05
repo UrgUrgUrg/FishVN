@@ -6,14 +6,14 @@ init python:
     Lophi = Fish(
         name="Lophi",
         description="Somewhat guarded lantern fish.",
-        weight=400,
+        weight=399.8,
         height=5.7,
         dateable=True,
         lureTraits = ["normal","horny","cool"],
         giftTraits = ["edible","sentimental"],
         specialLure = "Lantern fish fish lantern"
     )
-    ## This next bit's super important, make sure your character's name gets changed here
+    ## This next bit's super important as it adds them to the game's characters, make sure your character's name gets added in place of 'Lophi' here
     characters.append(Lophi)
 
 ## Define what colour your character's name has
@@ -69,7 +69,7 @@ label Lophi_RejectGift:
     return
 
 label Lophi_ThrownBack:
-    ## A little  sign-off for when the player has talked to your character enough
+    ## A little optional sign-off for when the player has talked to your character enough
     ## and throws them abck in the water
     if character_trait(affection_level) > 10:
         lophi "Later holmes"
