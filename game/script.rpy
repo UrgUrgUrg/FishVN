@@ -72,7 +72,7 @@ init -5 python:
     
     def increase_affection(num):
         currentCharacter.affectionLevel += num
-        renpy.call_screen("affectionIncrease")
+        renpy.call("affectionIncrease")
 
     def obtainSpecialLure():
         playersLures.addItem(currentCharacter.specialLure)
@@ -94,9 +94,12 @@ init -5 python:
 
     #LURES
     Hook = Lure("Hook","A lure that's shaped like a fishing hook, who's horrible idea was that?",0,["normal","crappy"],1.50)
+    Minnow = Lure("Minnow","Less tasty than the real thing but also more sustainable",0,["normal"],12.99)
+    HulaGirl = Lure("Hula Girl","She shimmies! She shakes! She culturally appropriates! Good for hooking especailly horny catches",0,["normal","horny"],99.99)
+    GraphicRasta = Lure("Graphic Rasta","This rastafarian skulls proves you can be cool AND celebrate your faith!",0,["normal","cool"],99.99)
 
     #fill the character pool with a bunch of junk fish
-    characters = [Trout,Trout,Trout,Perch,Perch,Clownfish]
+    characters = [Trout,Trout,Perch,Perch,Trout,Clownfish]
 
     datingPool = []
 
@@ -111,7 +114,7 @@ init -5 python:
         fish = renpy.random.choice(characters)
         inventory.addItem(fish)
 
-    currentCharacter = characters[0]
+    currentCharacter = None
     currentStage = 0
     currentExpression = ""
     stringo = ""
@@ -136,24 +139,29 @@ transform fadeAway:
     align (0.5,0.5) alpha 1.0
     ease 2.0 alpha 0.0
 
-screen affectionIncrease:
-    window at fadeAway:
-        align (0.5,0.5)
-        xysize (500,500)
-        text "{color=#c96868}AFFECTION/nINCREASED"
-    timer 2.0 action Hide("affectionIncrease")
+label affectionIncrease:
+    show text "{size=40}{color=#e64fb3}{b}AFFECTION INCREASED{/b}" with dissolve
+    with Pause(1.5)
+    hide text with dissolve
+    return
 
 ## A transform to vibrate our text.
 transform vibrate:
-    pos(0.5, 0.4) anchor(0.5, 0.5) rotate 0
+    rotate 0
     linear 0.1 rotate 5
     linear 0.1 rotate 0
     linear 0.1 rotate -5
     linear 0.1 rotate 0
     repeat
 
+transform dontvibrate:
+    rotate 0
+
 label start:
     $playersLures.addItem(Hook)
+    $playersLures.addItem(GraphicRasta)
+    $playersLures.addItem(HulaGirl)
+    $playersLures.addItem(Minnow)
     $currentLure = playersLures.items[0]
     jump hut
 
@@ -184,6 +192,7 @@ label fishingMenu:
             with easeinleft
             call screen lure_select
             $currentLure = playersLures.items[_return]
+            "You have equipped [currentLure.name]"
             jump fishingMenu
         "Put fishing rod away":
             play sound "SFX/closechest.ogg"
@@ -203,17 +212,29 @@ label lakeside:
             return
 
 
-screen lure_select:
-    text "Owned Lures..."
-    grid 3 3:
-        align (0.5,0.5)
-        xysize(800,800)
-        for i, numeral index numeral in enumerate(playersLures.items):
-            $imageString = playersLures.items[i].image
-            $textString = playersLures.items[i].name
-            button action Return(i),Hide("lure_select"):
-                vbox:
-                    add "[imageString]"
-                    text "[textString]"
 
+
+screen lure_select:
+    default activeButton = 0
+    frame align (0.9,0.5) xysize (600,800) padding(30,30):
+        viewport draggable True:
+            vbox:
+                text playersLures.items[activeButton].name size 60 xalign(0.5) color("#89deff")
+                text playersLures.items[activeButton].description
+                null height 20
+    frame align (0.2,0.5) xysize (900,800):
+        vbox:                    
+            text "Owned Lures..."
+            viewport draggable True mousewheel True:
+                grid 2 3 xalign(0.5):
+                    for i, numeral index numeral in enumerate(playersLures.items):
+                        $imageString = playersLures.items[i].image
+                        $textString = playersLures.items[i].name
+                        button action Return(i),Hide("lure_select") hovered SetScreenVariable("activeButton",i):
+                            vbox:
+                                if (activeButton==i):
+                                    add "[imageString]" at vibrate
+                                else:
+                                    add "[imageString]" at dontvibrate
+                                text "[textString]"  xalign(0.5)
 

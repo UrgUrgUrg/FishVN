@@ -2,9 +2,9 @@
 errors listed below, and try again.
 
 
-File "game/script.rpy", line 121: ATL statement contains two expressions in a row; is one of them a misspelled property? If not, separate them with pass.
-    easeIn 2.0 alpha 0.0
-               ^
+File "game/script.rpy", line 221: 'padding' is not a keyword argument or valid child of the viewport statement.
+    padding (30,30)
+           ^
 
 Ren'Py Version: Ren'Py 8.2.1.24030407
-Sat May  4 22:05:36 2024
+Sun May  5 12:13:48 2024

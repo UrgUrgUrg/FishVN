@@ -59,20 +59,12 @@ init python:
             theValue = -30*distance
             trans.rotate = (theValue*st)
             return 0
-
-    def flipRod(trans,st,at):
-        if (fishX > fishingX):
-            trans.xzoom = 1.0
-        else:
-            trans.xzoom = -1.0
-        return 0.1
         
 
 
 transform rodrot:
-    transform_anchor True anchor(1.0, 0.0) rotate 0 xzoom 1.0
+    transform_anchor True anchor(1.0, 0.0) rotate 0
     function dynamic_rotate
-    function flipRod
     repeat   
 
 transform slowzoom:
@@ -95,7 +87,7 @@ screen minigame:
     on "show" action SetVariable("fishDepth",1100)
     #graphics
     on "show" action Play("sound","SFX/HitWater.ogg"), Play("music","Reggae.ogg")
-    add DynamicDisplayable(characterCode) at vibrate:
+    add DynamicDisplayable(characterCode):
         anchor(0.5,0.2)
         xpos round(fishX)
         ypos round(fishDepth)
@@ -222,13 +214,13 @@ label caught_character:
         "Talk with [charName]" if not talkedTo:
             $talkedTo=True
             if (currentCharacter.dateable == True):
-                call expression charName+"_Catch" from _call_expression
+                call expression charName+"_Catch"
                 jump char_menu
             else:
                 jump blubtalk
         "Give [charName] a gift" if (currentCharacter.dateable == True) and not givenGift:
             $givenGift=True
-            call expression charName+"_AcceptGift" from _call_expression_1
+            call expression charName+"_AcceptGift"
             "[charName] has accepted your gift"
             $increase_affection(3)
             jump char_menu
@@ -238,7 +230,7 @@ label caught_character:
             $getFish()
             jump fishingMenu
         "Throw [charName] back":
-            play sound "SFX/splash.ogg"
+            play sound "splash.ogg"
             jump end_converstion
 
 label end_converstion:

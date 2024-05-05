@@ -1,28 +1,41 @@
 ﻿I'm sorry, but an uncaught exception occurred.
 
 While running game code:
-  File "game/minigame.rpy", line 194, in script
-    python:
-  File "game/minigame.rpy", line 196, in <module>
-    print(datingPool[len(datingPool)-1].name)
-IndexError: list index out of range
+  File "game/minigame.rpy", line 246, in script
+    with easeinbottom
+OSError: Couldn't find file 'splash.ogg'.
 
 -- Full Traceback ------------------------------------------------------------
 
 Full traceback:
-  File "game/minigame.rpy", line 194, in script
-    python:
-  File "C:\Renpy\renpy-8.2.1-sdk\renpy\ast.py", line 823, in execute
-    renpy.python.py_exec_bytecode(self.code.bytecode, self.hide, store=self.store)
-  File "C:\Renpy\renpy-8.2.1-sdk\renpy\python.py", line 1178, in py_exec_bytecode
-    exec(bytecode, globals, locals)
-  File "game/minigame.rpy", line 196, in <module>
-    print(datingPool[len(datingPool)-1].name)
-  File "C:\Renpy\renpy-8.2.1-sdk\renpy\revertable.py", line 221, in __getitem__
-    rv = list.__getitem__(self, index)
-IndexError: list index out of range
+  File "game/minigame.rpy", line 246, in script
+    with easeinbottom
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\ast.py", line 1363, in execute
+    renpy.exports.with_statement(trans, paired=paired)
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\exports.py", line 1781, in with_statement
+    return renpy.game.interface.do_with(trans, paired, clear=clear)
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\display\core.py", line 1548, in do_with
+    return self.interact(trans_pause=True,
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\display\core.py", line 2165, in interact
+    repeat, rv = self.interact_core(preloads=preloads, trans_pause=trans_pause, pause=pause, pause_start=pause_start, pause_modal=pause_modal, **kwargs) # type: ignore
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\display\core.py", line 3022, in interact_core
+    renpy.audio.audio.periodic()
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\audio\audio.py", line 1205, in periodic
+    raise_(exc[0], exc[1], exc[2])
+  File "lib/python3.9/future/utils/__init__.py", line 444, in raise_
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\audio\audio.py", line 1183, in periodic_thread_main
+    periodic_pass()
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\audio\audio.py", line 1125, in periodic_pass
+    c.periodic()
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\audio\audio.py", line 534, in periodic
+    topf = load(filename)
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\audio\audio.py", line 72, in load
+    rv = renpy.loader.load(fn, directory="audio")
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\loader.py", line 672, in load
+    raise IOError("Couldn't find file '%s'." % name)
+OSError: Couldn't find file 'splash.ogg'.
 
 Windows-10-10.0.19045 AMD64
 Ren'Py 8.2.1.24030407
 FishLoveMe 1.0
-Sat May  4 22:53:46 2024
+Sun May  5 13:00:49 2024
