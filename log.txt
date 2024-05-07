@@ -1,18 +1,36 @@
-2024-05-05 16:36:31 UTC
+2024-05-07 09:38:11 UTC
 Windows-10-10.0.19045
 Ren'Py 8.2.1.24030407
 
-Early init took 0.12s
-Loading error handling took 0.05s
-Loading script took 0.40s
-Loading save slot metadata took 0.05s
+Early init took 0.10s
+Loading error handling took 0.04s
+Loading script took 0.26s
+Loading save slot metadata took 0.04s
 Loading persistent took 0.00s
 
-File "game/Character_Template.rpy", line 61: Indentation mismatch.
+Full traceback:
+  File "game/defs.rpy", line 16, in script
+    define npc = Character(currentCharacter.name,colour=currentCharacter.nameColor)
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\ast.py", line 2219, in execute
+    self.set()
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\ast.py", line 2233, in set
+    value = renpy.python.py_eval_bytecode(self.code.bytecode)
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\python.py", line 1202, in py_eval_bytecode
+    return eval(bytecode, globals, locals)
+  File "game/defs.rpy", line 16, in <module>
+    define npc = Character(currentCharacter.name,colour=currentCharacter.nameColor)
+AttributeError: 'NoneType' object has no attribute 'name'
+
+While running game code:
+  File "game/defs.rpy", line 16, in script
+    define npc = Character(currentCharacter.name,colour=currentCharacter.nameColor)
+  File "game/defs.rpy", line 16, in <module>
+    define npc = Character(currentCharacter.name,colour=currentCharacter.nameColor)
+AttributeError: 'NoneType' object has no attribute 'name'
 DPI scale factor: 1.000000
 nvdrs: Loaded, about to disable thread optimizations.
 nvdrs: Disabled thread optimizations.
-Interface start took 0.48s
+Interface start took 0.51s
 
 Initializing gl2 renderer:
 primary display bounds: (0, 0, 1920, 1080)

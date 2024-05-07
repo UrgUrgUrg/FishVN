@@ -2,7 +2,9 @@
 errors listed below, and try again.
 
 
-File "game/Character_Template.rpy", line 61: Indentation mismatch.
+File "game/script.rpy", line 198: expected statement.
+    povname = "Fisher"
+            ^
 
 Ren'Py Version: Ren'Py 8.2.1.24030407
-Sun May  5 17:36:31 2024
+Tue May  7 10:29:26 2024

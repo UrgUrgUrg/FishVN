@@ -9,9 +9,11 @@ image bg hut = "BG/hut.jpg"
 image bg market = "BG/market.jpg"
 
 define You = Character("You",color="#ffffff")
-define Ara = Character("Ara",color="#a81515")
-define Baitshop = Character("Trinika",color="#5878e2")
-define mystery = Character("???",color="#a81515")
+
+define Baitshop = Character("Trinika",color="#56f326")
+define Guy = Character("Guy", color="#375388")
+
+define npc = Character("[currentCharacter.name]",color="[colour=currentCharacter.nameColor]")
 
 init python:
     def characterCode(st,at):
@@ -69,7 +71,8 @@ init -6 python:
         global seconds
         seconds = seconds + ((hours*60)*60)
 
-
+    affection_level = 0
+    max_affection = 100
 
 image character = DynamicDisplayable(characterCode)
 

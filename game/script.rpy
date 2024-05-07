@@ -12,7 +12,7 @@ init -5 python:
     ## Defining a `Fish` class with name, weight, height, and price of the fish.
     ## Price of the fish is equivalent to the weight divided by 2 times the height
     class Fish:
-        def __init__(self, name, weight, height, description="This dumb fish isn't sexy AT ALL", dateable=True, lureTraits=["normal"], giftTraits=[], specialLure=None, negativeTraits=["crappy"],creator="",creatorUrl=""):
+        def __init__(self, name, weight, height, description="This dumb fish isn't sexy AT ALL", dateable=True, max_affection=0, nameColor="#fff" lureTraits=["normal"], giftTraits=[], specialLure=None, negativeTraits=["crappy"],creator="",creatorUrl=""):
             self.name = name
             if (dateable):
                 self.weight = weight
@@ -22,12 +22,17 @@ init -5 python:
                 self.weight = random.randrange(height/2, height*2) 
             self.price = round((weight/2) * height, 2)
             self.dateable = dateable
+            if (dateable):
+                self.max_affection = max_affection
+            else:
+                self.max_affection = 0
+                self.nameColor = nameColor
             self.description = description
             self.stage=0
             self.lureTraits = lureTraits
             self.giftTraits = giftTraits
             if (specialLure != None):
-                self.specialLure = Lure(specialLure,"A lure that can be used to instantly catch "+name)
+                self.specialLure = Lure(specialLure,"A lure that can be used to instantly catch "+name,traits=[str(name)])
             if dateable:
                 self.negativeTraits = negativeTraits
             else:
@@ -36,6 +41,7 @@ init -5 python:
             self.affectionLevel = 0
             self.creator = creator
             self.creatorUrl = creatorUrl
+            self.stagesSeen = []
 
     caught_times = 1
     affection_level = 2
@@ -109,6 +115,7 @@ init -5 python:
     #this will be what's avaible to the player to catch when they start fishing (based on lure used)
     datingPool = []
     caughtToday = []
+    fishyDex = []
 
     ##players starting lures
     playersLures = Inventory()
