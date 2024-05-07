@@ -138,12 +138,20 @@ style window:
 
     background Image("gui/textbox.png", xalign=0.5, yalign=1.0)
 
+init python:
+    def nameCol():
+            if (currentCharacter!=None):
+                return currentCharacter.nameColor
+            else:
+                return "#fff"
+
 style namebox:
     xpos gui.name_xpos
     xanchor gui.name_xalign
     xsize gui.namebox_width
     ypos gui.name_ypos
     ysize gui.namebox_height
+    color nameCol()
 
     background Frame("gui/namebox.png", gui.namebox_borders, tile=gui.namebox_tile, xalign=gui.name_xalign)
     padding gui.namebox_borders.padding

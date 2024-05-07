@@ -2,9 +2,8 @@
 errors listed below, and try again.
 
 
-File "game/script.rpy", line 198: expected statement.
-    povname = "Fisher"
-            ^
+File "game/Character Scripts/Character_Template.rpy", line 269: is not terminated with a newline. (Check strings and parenthesis.)
+            "What are your brother's names?" if ("family" in list(askedLophiAbout) and "brothernames" not in list(askedLophiAbout):
 
 Ren'Py Version: Ren'Py 8.2.1.24030407
-Tue May  7 10:29:26 2024
+Tue May  7 12:52:08 2024

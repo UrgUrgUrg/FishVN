@@ -4,8 +4,8 @@ init python:
     Lophi = Fish(
         name="Lophi",
             ## ^ Your character's name, your below labels must use this
-        nameColor="#51cfc9",
-            ## ^ Define what colour your character's name has
+        nameColor="#4cc4be",
+            ## ^ Define what colour your character's name has above their dialogue boxes - not implemented yet, this specifically is hard for w/e reason
         description="Somewhat guarded lantern fish.",
             ## ^ Something short and sweet for their entry in the fishydex
         weight=399.8,
@@ -27,11 +27,8 @@ init python:
     characters.append(Lophi)
         ## ^This bit of code's's super important as it adds your Fish() object to the game's characters, make sure your character's object name gets added in place of 'Lophi' here
 
-    characters = [Lophi]
+    #characters = [Lophi]
         ### ^ Uncomment the code above to make lophi the game's ONLY character - this will be super helpful for testing!
-
-
-define lophi = Character("Lophi",color=)
 
 init:
     $lophiGotFat=False
@@ -88,7 +85,8 @@ label Lophi_Talk:
     return
 
 label Lophi_Talk_revisit:
-    jump label_lophiConvo
+    call label_lophiConvo
+    return
 
 label Lophi_AcceptGift:
     ## Character accepts a gift, increasing their affection level by it's value
@@ -102,7 +100,7 @@ label Lophi_RejectGift:
 
 label Lophi_ThrownBack:
     ## A little optional sign-off for when the player has talked to your character enough
-    ## and throws them abck in the water
+    ## and throws them back in the water
     npc "Bye bitch"
     return
 
@@ -133,6 +131,10 @@ label Lophi_Confession:
 label Lophi_Catch_10:
     npc "Are you for real? THIS fool again?"
     return
+
+label Lophi_Talk_10:
+    npc "Pff, whatever."
+    call lophi_convo
 
 label Lophi_AcceptGift_10:
     npc "A'ight. You a suck-up but you cute with it."
@@ -250,7 +252,7 @@ label lophi_convo:
             else:
                 npc "AMA, homie."
                 jump lophi_questions
-        "I think your new weight looks good on you" if lophiGotFat and "complimentweight" is not in askedLophiAbout:
+        "I think your new weight looks good on you" if (lophiGotFat is True and not 'complimentweight' in list(askedLophiAbout)):
             "Lophi just about manages to supress her smirk, but her lantern glows warmly regardless."
             npc "Shut up, dumbass."
             $increase_affection(10)
@@ -261,15 +263,16 @@ label lophi_convo:
 
 label lophi_questions:
     menu:
-        "I'm [playername]" if "introductions" not in askedLophiAbout:
+        "I'm [playerName]" if not 'introductions' in list(askedLophiAbout):
             npc "Lophi. It's... 'an event in my day' to meet you."
             $askedLophiAbout.append("introductions")
             jump lophi_questions
-        "Any family?" if "family" not in askedLophiAbout:
+        "Any family?" if not 'family' in list(askedLophiAbout):
             npc "I live with my three brothers, way down at the bottom of the lake."
             npc "The littlest one's kinda sick and the other two are just fuck-ups so it's up to big sis here to keep 'em fed and out of tuna nets."
             $askedLophiAbout.append("family") ### add this to topics taht have been spoken about
-        "What are your brother's names?" if ("family" in askedLophiAbout and "brothernames" not in askedLophiAbout):
+            jump lophi_questions
+        "What are your brother's names?" if 'family' in list(askedLophiAbout) and not 'brothernames' in list(askedLophiAbout):
             if (affection_level < 25):
                     ## ^ Alternative way of checking affection level
                 npc "Who wants to fucken know, Zuckerburg? Keep this shit between us!"
@@ -281,11 +284,13 @@ label lophi_questions:
                 "Lophi looks whistful for a second, her lantern's color settles ona  cool blue"
                 npc "It'd be cool if you could come down and meet 'em some day. You'd... prolly need like a diving suit or something."
                 $askedLophiAbout.append("brothernames")
-        "Aren't anglerfish usually saltwater creatures?" if "freshwater" not in askedLophiAbout:
+            jump lophi_questions
+        "Aren't anglerfish usually saltwater creatures?" if not 'freshwater' in list(askedLophiAbout):
             npc "My family moved! You got a problem with that?"
             npc "I dunno, the algae out here's meant to be good for my lil' brother's gill condition or some shit."
             npc "Gotta try this stuff out if it's for family, y'know."
             $askedLophiAbout.append("freshwater")
+            jump lophi_questions
         "I'll stop interrogating you now":
             npc "Kind of you!"
             jump lophi_convo

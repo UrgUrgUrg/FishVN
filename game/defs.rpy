@@ -8,12 +8,14 @@ image bg lake = "BG/lake.jpg"
 image bg hut = "BG/hut.jpg"
 image bg market = "BG/market.jpg"
 
+image fishing gear = "BG_Props/fishing_gear.png"
+
 define You = Character("You",color="#ffffff")
 
-define Baitshop = Character("Trinika",color="#56f326")
+define Baitshop = Character("Trinika",color="#e4f82e")
 define Guy = Character("Guy", color="#375388")
 
-define npc = Character("[currentCharacter.name]",color="[colour=currentCharacter.nameColor]")
+define npc = Character("[currentCharacter.name]",color="#52d69f") ## can't figure out how to make this color dynamic
 
 init python:
     def characterCode(st,at):

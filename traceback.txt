@@ -1,28 +1,32 @@
 ﻿I'm sorry, but an uncaught exception occurred.
 
 While running game code:
-  File "game/defs.rpy", line 16, in script
-    define npc = Character(currentCharacter.name,colour=currentCharacter.nameColor)
-  File "game/defs.rpy", line 16, in <module>
-    define npc = Character(currentCharacter.name,colour=currentCharacter.nameColor)
-AttributeError: 'NoneType' object has no attribute 'name'
+  File "game/minigame.rpy", line 262, in script call
+    call findLabel("Catch")
+  File "game/minigame.rpy", line 227, in script
+    if (not current.dateable):
+  File "game/minigame.rpy", line 227, in <module>
+    if (not current.dateable):
+NameError: name 'current' is not defined
 
 -- Full Traceback ------------------------------------------------------------
 
 Full traceback:
-  File "game/defs.rpy", line 16, in script
-    define npc = Character(currentCharacter.name,colour=currentCharacter.nameColor)
-  File "C:\Renpy\renpy-8.2.1-sdk\renpy\ast.py", line 2219, in execute
-    self.set()
-  File "C:\Renpy\renpy-8.2.1-sdk\renpy\ast.py", line 2233, in set
-    value = renpy.python.py_eval_bytecode(self.code.bytecode)
+  File "game/minigame.rpy", line 262, in script call
+    call findLabel("Catch")
+  File "game/minigame.rpy", line 227, in script
+    if (not current.dateable):
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\ast.py", line 1842, in execute
+    if renpy.python.py_eval(condition):
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\python.py", line 1209, in py_eval
+    return py_eval_bytecode(code, globals, locals)
   File "C:\Renpy\renpy-8.2.1-sdk\renpy\python.py", line 1202, in py_eval_bytecode
     return eval(bytecode, globals, locals)
-  File "game/defs.rpy", line 16, in <module>
-    define npc = Character(currentCharacter.name,colour=currentCharacter.nameColor)
-AttributeError: 'NoneType' object has no attribute 'name'
+  File "game/minigame.rpy", line 227, in <module>
+    if (not current.dateable):
+NameError: name 'current' is not defined
 
 Windows-10-10.0.19045 AMD64
 Ren'Py 8.2.1.24030407
 FishLoveMe 0.0
-Tue May  7 10:38:11 2024
+Wed May  8 15:20:41 2024

@@ -12,7 +12,7 @@ init -5 python:
     ## Defining a `Fish` class with name, weight, height, and price of the fish.
     ## Price of the fish is equivalent to the weight divided by 2 times the height
     class Fish:
-        def __init__(self, name, weight, height, description="This dumb fish isn't sexy AT ALL", dateable=True, max_affection=0, nameColor="#fff" lureTraits=["normal"], giftTraits=[], specialLure=None, negativeTraits=["crappy"],creator="",creatorUrl=""):
+        def __init__(self, name, weight, height, description="This dumb fish isn't sexy AT ALL", dateable=True, max_affection=0, nameColor="#fff", lureTraits=["normal"], giftTraits=[], specialLure=None, negativeTraits=["crappy"],creator="",creatorUrl=""):
             self.name = name
             if (dateable):
                 self.weight = weight
@@ -145,6 +145,8 @@ init -5 python:
     endOfDay = False
     datingPoolSet = False
 
+    playerName="Fisher"
+
 ## Our flag, whether or not we are casting our fish... rod... I don't know, I don't fish.
 default casting = False
 
@@ -191,11 +193,10 @@ label clockTest:
 
 label start:
     show screen clock
-    $playersLures.addItem(Hook)
     $playersLures.addItem(GraphicRasta)
     $playersLures.addItem(HulaGirl)
     $playersLures.addItem(Minnow)
-    $currentLure = playersLures.items[0]
+    $currentLure = playersLures.items[-1]
     jump hut
 
 label hut:
@@ -216,7 +217,7 @@ label hut:
             $endOfDay=False
             $datingPoolSet=False
             $caughtToday=[]
-            "Your bookie always told you you'd end up sleeping with the fishes one day..."
+            "Zzz"
             scene hut
             with dissolve
 
@@ -276,8 +277,10 @@ label lakeside:
     scene bg lake
     with dissolve
     menu:
-        "Unpack your fishing rod":
+        "Unpack your fishing gear":
             $advanceMinutes(20)
+            show fishing gear
+            with dissolve
             play sound "SFX/setup.ogg"
             jump fishingMenu
         "Return home":

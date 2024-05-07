@@ -27,7 +27,7 @@ init python:
             redness = min(255,max(0,(fishDepth/2000)*255))
             greenness = min(255,255*distance)
             c = (redness,greenness,0)
-            t = 2 + 2*distance
+            t = 2 + 3*distance
             s.polygon(c, [(self.x1-t, self.y1),(self.x1+t,self.y1),(self.x2+t,self.y2),(self.x2-t,self.y2)],0)
 
            ## t = Transform(child=self.child)
@@ -79,9 +79,9 @@ transform slowzoom:
 
 transform struggle:
     rotate 0 
-    ease 0.2 rotate 40
+    ease 0.2 rotate 80*distance 
     ease 0.2 rotate 0
-    ease 0.2 rotate -40
+    ease 0.2 rotate -80*distance
     ease 0.2 rotate 0
     repeat
       
@@ -125,9 +125,9 @@ screen minigame:
     timer 0.2 action If(fishX<0,SetScreenVariable("reversal", False)) repeat True
     timer 0.3 action If(tick > 80 and fishX < 1920,SetScreenVariable("reversal", True)) repeat True
     timer 0.3 action If(tick < 5 and fishX > 0,SetScreenVariable("reversal", False)) repeat True
-    if (reversal and (fishX>fishingX)):
+    if (reversal and (fishX<fishingX)):
         $correctSide=True
-    elif ((not reversal) and (fishingX>fishX)):
+    elif ((not reversal) and (fishingX<fishX)):
         $correctSide=True
     else:
         $correctSide=False
@@ -219,17 +219,47 @@ transform throwback:
     linear 1.0 yoffset -600 xzoom 0.5 yzoom 0.5 rotate 700
     linear 1.0 yoffset 500 xzoom 0.0 yzoom 0.0 rotate 700
 
+label findLabel(suffix):
+    $i = 0
+    $seenStages = []
+    $unseenStages = []
+    $expressionString = charName+"_"+suffix
+    if (not currentCharacter.dateable):
+        return
+    while (i <= currentCharacter.affectionLevel):
+        if (renpy.has_label(expressionString+"_"+str(i))):
+            if (not i in list(currentCharacter.stagesSeen)):
+                $unseenStages.append(i)
+            else:
+                $seenStages.append(i)
+        $i += 1
+    
+    if unseenStages:
+        $currentCharacter.stagesSeen.append(unseenStages[0])
+        call expression expressionString+"_"+str(unseenStages[0])
+    else:
+        if seenStages:
+            if renpy.has_label(expressionString+"_"+str(seenStages[-1])+"_revist"):
+                call expression expressionString+"_"+str(seenStages[-1])+"_revist"
+            else:
+                call expression expressionString+"_"+str(seenStages[-1])
+        else:
+            call expression expressionString
+    return
+
+
 label caught_character:
     $currentCharacter.caughtTimes += 1
     $caughtToday.append(currentCharacter)
     $talkedTo=False
     $givenGift=False
-    $affection_level = currentCharacter.affection_level
+    $affection_level = currentCharacter.affectionLevel
     $max_affection = currentCharacter.max_affection
     if not currentCharacter in fishyDex:
         $fishyDex.append(currentCharacter)
     show character at top
     with easeinbottom
+    call findLabel("Catch")
     jump catch_menu
 
 label catch_menu:
@@ -237,8 +267,8 @@ label catch_menu:
         "Talk with [charName]" if not talkedTo:
             $talkedTo=True
             if (currentCharacter.dateable == True):
-                if renpy.has_label(charName+"_Catch"):
-                    call expression charName+"_Catch"
+                if renpy.has_label(charName+"_Talk"):
+                    call findLabel("Talk")
                 else:
                     "You and [charName] chat for a while."
                 jump char_menu
@@ -247,11 +277,11 @@ label catch_menu:
         "Give [charName] a gift" if (currentCharacter.dateable == True) and not givenGift:
             $givenGift=True
             if renpy.has_label(charName+"_AcceptGift"):
-                call expression charName+"_AcceptGift" 
+                call findLabel("AcceptGift")
             else:
                 "You offer [charName] a gift"
             "[charName] has accepted your gift"
-            $increase_affection(3)
+            $increase_affection(25)
             jump char_menu
         "Add [charName] to inventory" if not currentCharacter.dateable:
             hide character
@@ -268,7 +298,7 @@ label end_converstion:
     play sound "SFX/splash.ogg"
     hide character
     if renpy.has_label(charName+"_ThrownBack"):
-        call expression charName+"_ThrownBack"
+        call findLabel("ThrownBack")
     hide character
     with easeinbottom
     $currentCharacter=None
