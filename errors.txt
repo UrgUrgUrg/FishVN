@@ -2,8 +2,9 @@
 errors listed below, and try again.
 
 
-File "game/Character Scripts/Character_Template.rpy", line 269: is not terminated with a newline. (Check strings and parenthesis.)
-            "What are your brother's names?" if ("family" in list(askedLophiAbout) and "brothernames" not in list(askedLophiAbout):
+File "game/Character Scripts/Isu.rpy", line 87: end of line expected.
+    npc 'Really now? Never occured to you that maybe I wouldn't enjoy getting "caught"? But I s'pose that I could overlook this grievous insult of yours with some kind of compensation... hehe'
+                                                              ^
 
 Ren'Py Version: Ren'Py 8.2.1.24030407
-Tue May  7 12:52:08 2024
+Thu May  9 21:55:41 2024

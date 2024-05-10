@@ -18,9 +18,9 @@ init -5 python:
                 self.weight = weight
                 self.height = height
             else:
-                self.weight = random.randrange(weight/2, weight*2) 
-                self.weight = random.randrange(height/2, height*2) 
-            self.price = round((weight/2) * height, 2)
+                self.weight = (weight/2) + weight*renpy.random.random()
+                self.height = (height/2) + height*renpy.random.random()
+            self.price = round(((self.weight/2) * self.height)*3, 2)
             self.dateable = dateable
             if (dateable):
                 self.max_affection = max_affection
@@ -74,7 +74,10 @@ init -5 python:
     class Inventory:
         def __init__(self):
             self.items = []
-            self.coins = 0
+            self.fish=[]
+            self.gifts=[]
+            self.victims=[]
+            self.coins = 0.0
 
         ## `addItem` method - does what it's called. It adds the item (in this project, it adds fishes) into our inventory.
         def addItem(self, item):
@@ -101,7 +104,9 @@ init -5 python:
     ##JUNK FISH
     Trout = Fish("Trout",2.0,2.0,dateable=False)
     Perch = Fish("Perch",2.0,2.0,dateable=False)
-    Clownfish = Fish("Clown Fish",2,2,dateable=False)
+    Clownfish = Fish("Clown Fish",2,2,dateable=False,description="Marine biology fact: Not actually funny.")
+    Banana = Fish("Banana Squid",0.8,0.6,dateable=False,description="One slippery customer.")
+    Boot = Fish("Sole",2.4,0.8,dateable=False,description="Has a uniquely leathery texture.")
 
     #LURES
     Hook = Lure("Hook","A lure that's shaped like a fishing hook, who's horrible idea was that?",0,["normal","crappy"],1.50)
@@ -110,7 +115,7 @@ init -5 python:
     GraphicRasta = Lure("Graphic Rasta","This rastafarian skulls proves you can be cool AND celebrate your faith!",0,["normal","cool"],99.99)
 
     #fill the character pool with a bunch of junk fish
-    characters = [Trout,Trout,Perch,Perch,Trout,Clownfish]
+    characters = [Trout,Trout,Perch,Perch,Trout,Clownfish,Banana,Boot]
 
     #this will be what's avaible to the player to catch when they start fishing (based on lure used)
     datingPool = []
@@ -144,6 +149,8 @@ init -5 python:
 
     endOfDay = False
     datingPoolSet = False
+
+    location = "Home"
 
     playerName="Fisher"
 
@@ -200,6 +207,7 @@ label start:
     jump hut
 
 label hut:
+    $location="Home"
     play music "hut.ogg"
     scene hut
     with dissolve
@@ -217,15 +225,21 @@ label hut:
             $endOfDay=False
             $datingPoolSet=False
             $caughtToday=[]
+            $dayProgress=0
             "Zzz"
             scene hut
             with dissolve
+            jump hut
 
 init:
     $blackMarketUnlocked=False
 
 label town:
+    $location="Market"
     play music "market.ogg"
+    jump town_menu
+
+label town_menu:
     scene bg market
     with dissolve
     menu:
@@ -249,10 +263,16 @@ init:
     $rememberLure = 0
 
 label fishingMenu:
+    scene lake
+    with dissolve
+    show fishing gear
+    with dissolve
+    play sound "SFX/setup.ogg"
+    call check_time
     show lure at topleft
     with easeinleft
     menu fishing_menu:
-        "Select your lure":
+        "Select your lure" if not endOfDay:
             $advanceMinutes(10)
             hide lure
             with easeinleft
@@ -266,22 +286,61 @@ label fishingMenu:
                 "You decided to stick with [currentLure.name]"
             jump fishingMenu
         "Put fishing rod away":
+            hide fishing gear
+            with dissolve
             $advanceMinutes(20)
             play sound "SFX/closechest.ogg"
             jump lakeside
         "{color=#43f2ff}{size=+20}{b}Start Fishing{/b}{size=-20}" if not endOfDay:
+            scene bg water_close
+            with dissolve
             jump fishing_start
 
+init:
+    $dayProgress = 0
+
+label check_time:
+    if seconds < 32400:
+        if dayProgress==0:
+            if location=="Lake":
+                scene bg lakeside
+                with dissolve
+                "The riverside is tranquil and quiet"
+            $dayProgress=1
+    elif seconds > 32400:
+        if dayProgress==1:
+            if location=="Lake":
+                scene bg boats
+                with dissolve
+                "The islander's 9-to-5 is in full swing, but you manage to peel away from the commercial fishing boats that have started dotting the landscape and find a nice secluded spot."
+            $dayProgress=2
+    elif second > 68400:
+        if dayProgress==2:
+            if location=="Lake":
+                scene bg sunset
+                with dissolve
+                "You notice the other fishers begin to pack their gear up as the day draws to a close, it will soon be too dark to fish safely."
+            $dayProgress=3
+    elif second > 75600:
+        if dayProgress==3:
+            if location=="Lake":
+                scene bg night
+                with dissolve
+                "It's dark. you will be eaten by a grouper..."
+            $dayProgress=4
+            $endOfDay=True    
+    return
+
 label lakeside:
+    $location="Lake"
     play music "Bossanova.ogg"
-    scene bg lake
-    with dissolve
+    call check_time
+    if not endOfDay:
+        scene bg lakeside
+        with dissolve
     menu:
-        "Unpack your fishing gear":
+        "Unpack your fishing gear" if not endOfDay:
             $advanceMinutes(20)
-            show fishing gear
-            with dissolve
-            play sound "SFX/setup.ogg"
             jump fishingMenu
         "Return home":
             $advanceMinutes(15)
@@ -302,10 +361,14 @@ screen lure_select(shop = False):
                 text lureList[activeButton].description
                 null height 20
                 if shop:
-                    text "$"+ lureList[activeButton].price size 40 color("#d0ff28")
+                    if (lureList[activeButton].price > playersLures.coins):
+                        text "$"+ str(lureList[activeButton].price) size 40 color("#ee1616")
+                    else:
+                        text "$"+ lureList[activeButton].price size 40 color("#d0ff28")
+                    text "[playerName]'s money: $[str(playersLures.coins)]" size 20 color("#d0ff28")
     frame align (0.2,0.5) xysize (900,800):
         vbox:                    
-            text "Owned Lures..."
+            text "Available Lures..."
             viewport draggable True mousewheel True:
                 grid 2 3 xalign(0.5):
                     for i, numeral index numeral in enumerate(lureList):
@@ -319,22 +382,150 @@ screen lure_select(shop = False):
                                     add "[imageString]" at dontvibrate
                                 text "[textString]"  xalign(0.5)
 
+init:
+    $askforrec=False
+    $askedaboutref=False
+
+
 label baitShop:
-    Baitshop "Welcome to De Bait Club, mon. We'll help you catch the fish of your dreams."
+    Baitshop "Welcome to 'De Bait Club'. We'll help you catch the fish of your dreams."
     jump baitshopMenu
 
 label baitshopMenu:
     menu:
-        "Browse her wares":
-            call lure_select(shop=True)
-            "You chose [baitshopsLures.items[_return]]"
-        "Leave De Bait Club"
+        "I'd like to buy a new fishing lure":
+            $advanceHours(1)
+            Baitshop "Let me show you what we've got in stock!"
+            jump buying_a_lure  
+        "Can you refund unwanted lures here?" if not askedaboutref:
+            Baitshop "Can you guarantee that the product you have purchased has in no way been submerged in unsterilised liquid, been in contact with unwashed and/or unvaccinated wildlife, been exposed to blood or other bodily secretions or been used in any other way that may compromise said products hygiengic integrity thus rendering it unfit for sale at my store?"
+            menu:
+                "No...":
+                    pass
+                "You sort of just described 'using a lure for fishing'":
+                    pass
+                "Yes!":
+                    Baitshop "Very well then - I suppose all you'll have to do is show me your receipt..."
+                    menu:
+                        "You never gave me a receipt...":
+                            Baitshop "Aaaaahhh, tut tut. So you didn't think to ask for a receipt."
+                            $askforrec=True
+            Baitshop "That's such a shame then. In that case all sales are final. Happy fishing, valued customer!"
+            $asedaboutref=True
+        "*Leave De Bait Club*":
+            jump town
+
+label buying_a_lure:
+    call screen lure_select(shop=True)
+    $chosenLure = baitshopsLures.items[_return]
+    if (chosenLure.price > playersLures.coins):
+        Baitshop "I'm sorry chile, you need to earn more coin before you can be treating yourself here."
+        Baitshop "Maybe try selling some catches to the fish stall?"
+    else:
+        Baitshop "Absolute pleasure doing business with you!"
+        $playersLures.addItem(chosenLure)
+        $baitshopsLures.items.remove(chosenLure)
+        $playersLures.coins -= chosenLure.price
+        $baitshopsLures.coins += chosenLure.price
+    menu:
+        "May I please have a receipt for this purchase?" if askforrec:
+            Baitshop "Printer's broken."
+            $askforrec=False
+            jump baitshopMenu
+        "Keep shopping":
+            jump buying_a_lure
+        "Finish up":
+            jump baitshopMenu
 
 label giftShop:
     jump town
 
+init:
+    $totalFishValue = 0.0
+
 label fishShop:
+    show fishshop
+    with easeinright
+    Fishshop "Fresh fish! You catch 'em we buy 'em!"
+    jump fishshop_menu
+
+label get_total_fish_value:
+    python:
+        totalFishValue = 0
+        if len(playersLures.fish)>0:
+            for i in playersLures.fish:
+                totalFishValue += i.price
+        totalFishValue = round(totalFishValue,2)
+    return
+
+
+label fishshop_menu:
+    call get_total_fish_value
+    menu:
+        "Get a bunch of free fish":
+            $playersLures.fish.append(Clownfish)
+            $playersLures.fish.append(Banana)
+            $playersLures.fish.append(Boot)
+            $playersLures.fish.append(Clownfish)
+            $playersLures.fish.append(Perch)
+            jump fishshop_menu
+        "Sell your catches":
+            jump fishsellscreen
+        "Sell all your catches for $[totalFishValue]" if totalFishValue > 0:
+            jump sell_all_fish
+        "Leave the stall":
+            jump town
+
+label fishshop_afterpurchase:
+
+
+label sell_a_fish(thefish):
+    if (thefish==-1):
+        return
+    else:
+        play sound "SFX/cash.ogg"
+        $playersLures.coins += playersLures.fish[thefish].price
+        $playersLures.fish.remove(playersLures.fish[thefish])
+    return
+
+
+label fishsellscreen:
+    call get_total_fish_value
+    if playersLures.fish:
+        call screen sell_fish
+        call sell_a_fish(_return)
+        if (playersLures.fish):
+            jump fishsellscreen
+        else:
+            jump fishshop_menu
+
+label sell_all_fish:
+    $advanceHours(1)
+    play sound "SFX/cash.ogg"
+    Fishshop "Thank you!"
+    $playersLures.coins += totalFishValue
+    $playersLures.fish = []
     jump town
+
+screen sell_fish:
+    dismiss action Return(-1)
+    vbox:
+        viewport draggable True mousewheel True xysize(1920,800):
+                grid 8 999:
+                    align(0.5,0.5)
+                    for i, numeral index numeral in enumerate(playersLures.fish):
+                        $currentFish = playersLures.fish[i]
+                        button action Return(i):
+                            frame:
+                                vbox:
+                                    add "Characters/JunkFish/[currentFish.name].png":
+                                        xysize (200,200)
+                                    text "$[currentFish.price:.2f]" align(0.5,0.5)
+        button action Jump("sell_all_fish") xalign 0.5:
+            frame align (0.5,0.5) padding (10,10):
+                text "Sell all for $[totalFishValue]" size 60
+
+
 
 label blackMarket:
     jump town

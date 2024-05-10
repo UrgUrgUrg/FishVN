@@ -1,32 +1,108 @@
 ﻿I'm sorry, but an uncaught exception occurred.
 
 While running game code:
-  File "game/minigame.rpy", line 262, in script call
-    call findLabel("Catch")
-  File "game/minigame.rpy", line 227, in script
-    if (not current.dateable):
-  File "game/minigame.rpy", line 227, in <module>
-    if (not current.dateable):
-NameError: name 'current' is not defined
+  File "game/script.rpy", line 495, in script
+    call screen sell_fish
+  File "renpy/common/000statements.rpy", line 671, in execute_call_screen
+    store._return = renpy.call_screen(name, *args, **kwargs)
+  File "game/script.rpy", line 510, in execute
+    screen sell_fish:
+  File "game/script.rpy", line 510, in execute
+    screen sell_fish:
+  File "game/script.rpy", line 512, in execute
+    vbox:
+  File "game/script.rpy", line 513, in execute
+    viewport draggable True mousewheel True xysize(1920,800):
+  File "game/script.rpy", line 514, in execute
+    grid 8 999:
+  File "game/script.rpy", line 516, in execute
+    for i, numeral index numeral in enumerate(playersLures.fish):
+  File "game/script.rpy", line 518, in execute
+    button action Return(i):
+  File "game/script.rpy", line 519, in execute
+    frame:
+  File "game/script.rpy", line 520, in execute
+    vbox:
+  File "game/script.rpy", line 523, in execute
+    text "$[str(currentFish.price:.2f)]" align(0.5,0.5)
+SyntaxError: invalid syntax (<none>, line 1)
 
 -- Full Traceback ------------------------------------------------------------
 
 Full traceback:
-  File "game/minigame.rpy", line 262, in script call
-    call findLabel("Catch")
-  File "game/minigame.rpy", line 227, in script
-    if (not current.dateable):
-  File "C:\Renpy\renpy-8.2.1-sdk\renpy\ast.py", line 1842, in execute
-    if renpy.python.py_eval(condition):
-  File "C:\Renpy\renpy-8.2.1-sdk\renpy\python.py", line 1209, in py_eval
-    return py_eval_bytecode(code, globals, locals)
-  File "C:\Renpy\renpy-8.2.1-sdk\renpy\python.py", line 1202, in py_eval_bytecode
-    return eval(bytecode, globals, locals)
-  File "game/minigame.rpy", line 227, in <module>
-    if (not current.dateable):
-NameError: name 'current' is not defined
+  File "game/script.rpy", line 495, in script
+    call screen sell_fish
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\ast.py", line 1968, in execute
+    self.call("execute")
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\ast.py", line 1950, in call
+    return renpy.statements.call(method, parsed, *args, **kwargs)
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\statements.py", line 349, in call
+    return method(parsed, *args, **kwargs)
+  File "renpy/common/000statements.rpy", line 671, in execute_call_screen
+    store._return = renpy.call_screen(name, *args, **kwargs)
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\exports.py", line 3413, in call_screen
+    rv = renpy.ui.interact(mouse="screen", type="screen", roll_forward=roll_forward)
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\ui.py", line 301, in interact
+    rv = renpy.game.interface.interact(roll_forward=roll_forward, **kwargs)
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\display\core.py", line 2165, in interact
+    repeat, rv = self.interact_core(preloads=preloads, trans_pause=trans_pause, pause=pause, pause_start=pause_start, pause_modal=pause_modal, **kwargs) # type: ignore
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\display\core.py", line 2687, in interact_core
+    root_widget.visit_all(lambda d : d.per_interact())
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\display\displayable.py", line 431, in visit_all
+    d.visit_all(callback, seen)
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\display\displayable.py", line 431, in visit_all
+    d.visit_all(callback, seen)
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\display\displayable.py", line 431, in visit_all
+    d.visit_all(callback, seen)
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\display\screen.py", line 480, in visit_all
+    callback(self)
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\display\core.py", line 2687, in <lambda>
+    root_widget.visit_all(lambda d : d.per_interact())
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\display\screen.py", line 491, in per_interact
+    self.update()
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\display\screen.py", line 697, in update
+    self.screen.function(**self.scope)
+  File "game/script.rpy", line 510, in execute
+    screen sell_fish:
+  File "game/script.rpy", line 510, in execute
+    screen sell_fish:
+  File "game/script.rpy", line 512, in execute
+    vbox:
+  File "game/script.rpy", line 513, in execute
+    viewport draggable True mousewheel True xysize(1920,800):
+  File "game/script.rpy", line 514, in execute
+    grid 8 999:
+  File "game/script.rpy", line 516, in execute
+    for i, numeral index numeral in enumerate(playersLures.fish):
+  File "game/script.rpy", line 518, in execute
+    button action Return(i):
+  File "game/script.rpy", line 519, in execute
+    frame:
+  File "game/script.rpy", line 520, in execute
+    vbox:
+  File "game/script.rpy", line 523, in execute
+    text "$[str(currentFish.price:.2f)]" align(0.5,0.5)
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\text\text.py", line 1738, in __init__
+    self.set_text(text, scope, substitute) # type: ignore
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\text\text.py", line 1868, in set_text
+    i, did_sub = renpy.substitutions.substitute(i, scope, substitute) # type: ignore
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\substitutions.py", line 368, in substitute
+    s = interpolate(s, kwargs) # type: ignore
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\substitutions.py", line 86, in interpolate
+    raise e
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\substitutions.py", line 78, in interpolate
+    value = renpy.python.py_eval(code, {}, scope)
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\python.py", line 1207, in py_eval
+    code = py_compile(code, 'eval')
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\python.py", line 1144, in py_compile
+    raise e
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\python.py", line 1081, in py_compile
+    raise orig_e
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\python.py", line 1073, in py_compile
+    tree = compile(source, filename, py_mode, ast.PyCF_ONLY_AST | flags, 1)
+SyntaxError: invalid syntax (<none>, line 1)
 
 Windows-10-10.0.19045 AMD64
 Ren'Py 8.2.1.24030407
 FishLoveMe 0.0
-Wed May  8 15:20:41 2024
+Thu May  9 13:43:01 2024

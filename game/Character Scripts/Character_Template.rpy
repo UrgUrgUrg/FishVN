@@ -8,7 +8,7 @@ init python:
             ## ^ Define what colour your character's name has above their dialogue boxes - not implemented yet, this specifically is hard for w/e reason
         description="Somewhat guarded lantern fish.",
             ## ^ Something short and sweet for their entry in the fishydex
-        weight=399.8,
+        weight=299.8,
         height=5.7,
             ## ^ height and weight slightly contribute to their difficulty in the fishing game 
         max_affection=100,

@@ -6,13 +6,24 @@
 
 image bg lake = "BG/lake.jpg"
 image bg hut = "BG/hut.jpg"
+image bg exterior = "BG/exterior.jpg"
 image bg market = "BG/market.jpg"
+image bg lakeside = "BG/lakeside.jpg"
+image bg night = "Bg/night.jpg"
+image bg sunset = "BG/sunset.jpg"
+image bg water_close = "BG/waterclose.jpg"
+image bg boats = "BG/boats.jpg"
+image bg nightmarket = "BG/nightmarket.jpg"
 
 image fishing gear = "BG_Props/fishing_gear.png"
+
+image baitshop = "UrgNPCs/Trin.png"
+image fishshop = "UrgNPCs/Roro.png"
 
 define You = Character("You",color="#ffffff")
 
 define Baitshop = Character("Trinika",color="#e4f82e")
+define Fishshop = Character("Roro",color="#913bb3")
 define Guy = Character("Guy", color="#375388")
 
 define npc = Character("[currentCharacter.name]",color="#52d69f") ## can't figure out how to make this color dynamic
