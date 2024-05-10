@@ -94,27 +94,35 @@ style frame:
 ## and id "window" to apply style properties.
 ##
 ## https://www.renpy.org/doc/html/screen_special.html#say
+init:
+    $dialogueOffset = 0
 
 screen say(who, what):
-    style_prefix "say"
-
-    window:
-        id "window"
-
-        if who is not None:
-
-            window:
-                id "namebox"
-                style "namebox"
-                text who id "who"
-
-        text what id "what"
-
+    frame id "window":
+        yalign 1.0
+        xalign 0.5
+        padding (20,0)
+        xmaximum 1000
+        if renpy.get_screen("choice"):
+            yoffset -(65*dialogueOffset)
+        else:
+            yoffset -25
+        vbox:
+            if who is not None:
+                    text who id "who" xalign 0.1
+                    null height 20
+            text what id "what"
+            null height 60
 
     ## If there's a side image, display it above the text. Do not display on the
     ## phone variant - there's no room.
     if not renpy.variant("small"):
         add SideImage() xalign 0.0 yalign 1.0
+
+transform namebob:
+    yoffset 10 alpha 0.0
+    easeout 0.5 yoffset -2 alpha 1.0
+    ease 0.2 yoffset 0
 
 
 ## Make the namebox available for styling through the Character object.
@@ -132,11 +140,11 @@ style namebox_label is say_label
 
 style window:
     xalign 0.5
-    xfill True
-    yalign gui.textbox_yalign
-    ysize gui.textbox_height
+    xfill False
+    xsize 1000
+    #ysize gui.textbox_height
 
-    background Image("gui/textbox.png", xalign=0.5, yalign=1.0)
+    background Frame("gui/frame.png", xalign=0.5, yalign=1.0, yoffset=-25)
 
 init python:
     def nameCol():
@@ -146,11 +154,7 @@ init python:
                 return "#fff"
 
 style namebox:
-    xpos gui.name_xpos
-    xanchor gui.name_xalign
-    xsize gui.namebox_width
-    ypos gui.name_ypos
-    ysize gui.namebox_height
+    xalign 0.5
     color nameCol()
 
     background Frame("gui/namebox.png", gui.namebox_borders, tile=gui.namebox_tile, xalign=gui.name_xalign)
@@ -158,15 +162,18 @@ style namebox:
 
 style say_label:
     properties gui.text_properties("name", accent=True)
-    xalign gui.name_xalign
+    xalign 0.5
     yalign 0.5
+    
 
 style say_dialogue:
     properties gui.text_properties("dialogue")
 
-    xpos gui.dialogue_xpos
-    xsize gui.dialogue_width
-    ypos gui.dialogue_ypos
+    #xpos gui.dialogue_xpos
+    xalign 0.5
+    yalign 0.5
+    #xsize gui.dialogue_width
+   # ypos gui.dialogue_ypos
 
     adjust_spacing False
 
@@ -214,29 +221,30 @@ style input:
 ## https://www.renpy.org/doc/html/screen_special.html#choice
 
 screen choice(items):
+    on "show" action SetVariable("dialogueOffset",len(items))
     style_prefix "choice"
-
-    vbox:
-        for i in items:
-            textbutton i.caption action i.action
+    frame align(0.5,1.0) yoffset(-50) at namebob:
+        vbox:
+            for i in items:
+                textbutton "• "+i.caption action i.action
 
 
 style choice_vbox is vbox
 style choice_button is button
 style choice_button_text is button_text
 
-style choice_vbox:
-    xalign 0.5
-    ypos 405
-    yanchor 0.5
+#style choice_vbox:
+   # xalign 0.5
+   # ypos 405
+   # yanchor 0.5
 
-    spacing gui.choice_spacing
+   # spacing gui.choice_spacing
 
-style choice_button is default:
-    properties gui.button_properties("choice_button")
+#style choice_button is default:
+   # properties gui.button_properties("choice_button")
 
-style choice_button_text is default:
-    properties gui.text_properties("choice_button")
+#style choice_button_text is default:
+   #properties gui.text_properties("choice_button")
 
 
 ## Quick Menu screen ###########################################################
@@ -733,6 +741,10 @@ style slot_button_text:
 ##
 ## https://www.renpy.org/doc/html/screen_special.html#preferences
 
+init:
+    $fishing_settings = "normal"
+
+
 screen preferences():
 
     tag menu
@@ -758,6 +770,13 @@ screen preferences():
                     textbutton _("Unseen Text") action Preference("skip", "toggle")
                     textbutton _("After Choices") action Preference("after choices", "toggle")
                     textbutton _("Transitions") action InvertSelected(Preference("transitions", "toggle"))
+
+                vbox:
+                    style_prefix "radio"
+                    label _("Fishing Game")
+                    textbutton _("normal") action SetVariable("fishing_settings","normal")
+                    textbutton _("easy") action SetVariable("fishing_settings","easy")
+                    textbutton _("skip") action SetVariable("fishing_settings","skip")
 
                 ## Additional vboxes of type "radio_pref" or "check_pref" can be
                 ## added here, to add additional creator-defined preferences.

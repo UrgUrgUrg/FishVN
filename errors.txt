@@ -2,9 +2,8 @@
 errors listed below, and try again.
 
 
-File "game/Character Scripts/Isu.rpy", line 87: end of line expected.
-    npc 'Really now? Never occured to you that maybe I wouldn't enjoy getting "caught"? But I s'pose that I could overlook this grievous insult of yours with some kind of compensation... hehe'
-                                                              ^
+File "game/defs.rpy", line 261: invalid syntax
+        for i in range(chunkAmount)
 
 Ren'Py Version: Ren'Py 8.2.1.24030407
-Thu May  9 21:55:41 2024
+Fri May 10 17:43:14 2024

@@ -9,25 +9,28 @@ init python:
     fishSpeed = 15
     distance = 0
     charName = ""
+    correctSide = False
 
     class DynamicLine(renpy.Displayable):
 
         def __init__(self, x1, y1, x2, y2, **kwargs):
             super(DynamicLine, self).__init__(**kwargs)
-            self.x1 = x1
-            self.y1 = y1
-            self.x2 = x2
-            self.y2 = y2
+            self.x1 = max(0,x1)
+            self.y1 = max(0,y1)
+            self.x2 = max(0,x2)
+            self.y2 = max(5,y2)
             #self.child = renpy.displayable("Minigame/Rod.png")
 
         def render(self, width, height, st, at):
             r = renpy.Render(1920, 1080)
             s = r.canvas()
-            redness = min(255,max(0,(fishDepth/2000)*255))
-            greenness = min(255,255*distance)
+            redness = min(255,max(0,(fishDepth/2500)*255))
+            greenness=0
+            if (correctSide):
+                greenness = min(255,255*distance)
             c = (redness,greenness,0)
-            t = 2 + 3*distance
-            s.polygon(c, [(self.x1-t, self.y1),(self.x1+t,self.y1),(self.x2+t,self.y2),(self.x2-t,self.y2)],0)
+            t = max(0,2 + 3*distance)
+            s.polygon(c, [(max(0,self.x1-t), max(0,self.y1)),(max(1,self.x1+t),max(0,self.y1)),(max(1,self.x2+t),max(1,self.y2)),(max(0,self.x2-t),max(1,self.y2))],0)
 
            ## t = Transform(child=self.child)
 
@@ -78,9 +81,9 @@ transform slowzoom:
 
 transform struggle:
     rotate 0 
-    ease 0.2 rotate 80*distance 
+    ease 0.4 rotate 80*distance 
     ease 0.2 rotate 0
-    ease 0.2 rotate -80*distance
+    ease 0.4 rotate -80*distance
     ease 0.2 rotate 0
     repeat
       
@@ -90,10 +93,12 @@ screen minigame:
     modal True
     default tick = 0
     default reversal = False
-    default lineSlack = 200
     default fishEnergy = 100.0
-    default correctSide = False
-    $fishingX = renpy.get_mouse_pos()[0]
+    default allowedDistance = 1300
+    default reelTimer = 0
+    $fishingX = (renpy.get_mouse_pos()[0])
+    key "K_LEFT" action SetVariable("fishingX",fishingX - 1) 
+    key "K_RIGHT" action SetVariable("fishingX",fishingX + 1) 
     on "show" action SetVariable("fishingTimer",0)
     on "show" action SetVariable("fishX",renpy.random.randint(900, 1020))
     on "show" action SetVariable("fishDepth",min(2500 - currentCharacter.weight*2,1100.0 + (currentCharacter.weight)))
@@ -105,32 +110,29 @@ screen minigame:
         ypos round(fishDepth)
         xsize 200
         ysize 200 
-    add DynamicLine(fishingX, 5, fishX, fishDepth)
+    add DynamicLine(fishingX, 5, fishX, max(5,fishDepth))
     add "Minigame/Rod.png" xpos fishingX at rodrot
     text "Time: [fishingTimer] \n FishX: [fishX] FishDepth: [fishDepth]\n Tick: [tick] - [reversal]\n Distance: [distance]\n Fishenergy: [fishEnergy] Fish speed: [(fishSpeed+(fishEnergy*0.2))]"
     #gameplay code
-    timer 0.1 action SetVariable("fishDepth", fishDepth+(fishWeight/20)) repeat True
+    timer 0.1 action SetVariable("fishDepth", fishDepth+(fishWeight/8)) repeat True
+    timer 0.4 action SetScreenVariable("allowedDistance",(max(30,fishDepth/2500)*1300)) repeat True
     button:
         xsize 1920
         ysize 1080
-        action SetVariable("fishDepth",fishDepth-max(1,(100-fishEnergy)-(50*(1.0-distance)) )), Play("sound","SFX/reeling.ogg")
-    timer 0.05 action SetVariable("distance", (math.dist((fishingX,5),(fishX,5))/1920)*1) repeat True
+        action SetScreenVariable("reelTimer",5), Play("sound","SFX/Reeling.ogg")
+    timer 0.05 action If(reelTimer>0, SetVariable("fishDepth",max(0,fishDepth-3-(100-fishEnergy)))), SetScreenVariable("reelTimer",reelTimer-1) repeat True
+    timer 0.05 action SetVariable("distance", ((math.dist( (fishingX,5),(fishX,5))) / allowedDistance)*1) repeat True
     timer 5.0 action IncrementVariable("fishingTimer", 1) repeat True
     $fishForce=(fishSpeed-(fishEnergy*0.2))
-    timer 0.01 action If(reversal is True, SetVariable("fishX",max(-50,fishX-fishForce)), SetVariable("fishX",min(1970,fishX+fishForce))) repeat True
+    timer 0.01 action If(reversal is True, SetVariable("fishX",max(max(0,fishingX-allowedDistance),fishX-fishForce)), SetVariable("fishX",min(min(1920,fishingX+allowedDistance),fishX+fishForce))) repeat True
     timer 1.0 action If(renpy.random.randint(0,1)==0,SetScreenVariable("reversal",False),SetScreenVariable("reversal", True)) repeat True
-    if ((reversal == True) and (fishX>fishingX)):
-        $correctSide=True
-    elif ((reversal == False) and (fishX<fishingX)):
-        $correctSide=True
-    else:
-        $correctSide=False
-    timer 0.1 action If(correctSide,SetScreenVariable("fishEnergy", max(0.0,fishEnergy - (3.0*distance))), SetScreenVariable("fishEnergy", min(100.0,fishEnergy + 0.5))) repeat True
+    timer 0.01 action If((reversal==True and (fishX>fishingX)) or (reversal==False and (fishX<fishingX)),SetVariable("correctSide",True),SetVariable("correctSide", False)) repeat True
+    timer 0.01 action If(correctSide,SetScreenVariable("fishEnergy", max(0.0,fishEnergy - (3.0*distance))), SetScreenVariable("fishEnergy", min(100.0,fishEnergy + 0.5))) repeat True
     bar:
         value AnimatedValue(value=fishEnergy, range=100, delay=0.1, old_value=None)
         xysize(1000, 50)
         align (0.5,0.6)
-    text "FISH ENERGY: [fishEnergy]%" align(0.5,0.6)
+    text "LINE SLACK: [fishEnergy:.3f]%" align(0.5,0.6)
     bar:
         value AnimatedValue(value=fishDepth, range = 2500, delay=0.1, old_value=None)
         bar_vertical True
@@ -176,6 +178,10 @@ label fishing_start:
                         if t==lt:
                             if (not c in caughtToday):
                                 if (not c in datingPool):
+                                    if not c.dateable:
+                                        c.height = c.height/2 + c.height*random.random()
+                                        c.weight = c.weight/2 + c.weight*random.random()
+                                        c.price = round((c.weight + c.height)*0.75, 2)
                                     datingPool.append(c)
                             break
             renpy.random.shuffle(datingPool)
@@ -208,8 +214,11 @@ label fishing:
     menu:
         "This catch seems about [str(round(currentCharacter.weight))] lbs"
         "Reel 'em in!":
-           # call screen minigame
-           call screen winGame
+            # call screen minigame
+            if (fishing_settings=="skip"):
+                call screen winGame
+            else:
+                call screen minigame
         "Keep waiting":
             jump fishing
         "End fishing":

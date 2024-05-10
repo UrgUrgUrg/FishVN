@@ -145,6 +145,7 @@ default preferences.afm_time = 15
 
 define config.save_directory = "FishLoveMe-1714568104"
 
+define config.default_fullscreen = True
 
 ## Icon ########################################################################
 ##
@@ -183,6 +184,7 @@ init python:
     build.classify('**/.**', None)
     build.classify('**/#**', None)
     build.classify('**/thumbs.db', None)
+    build.classify('**.psd', None)
 
     ## To archive files, classify them as 'archive'.
 
@@ -206,4 +208,4 @@ init python:
 ## The username and project name associated with an itch.io project, separated
 ## by a slash.
 
-define build.itch_project = "UrgUrgurg/mermaygame2024"
+define build.itch_project = "UrgUrgUrg/mermaygame2024"

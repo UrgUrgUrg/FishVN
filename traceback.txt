@@ -1,37 +1,27 @@
 ﻿I'm sorry, but an uncaught exception occurred.
 
 While running game code:
-  File "game/script.rpy", line 495, in script
-    call screen sell_fish
+  File "game/minigame.rpy", line 221, in script
+    call screen minigame
   File "renpy/common/000statements.rpy", line 671, in execute_call_screen
     store._return = renpy.call_screen(name, *args, **kwargs)
-  File "game/script.rpy", line 510, in execute
-    screen sell_fish:
-  File "game/script.rpy", line 510, in execute
-    screen sell_fish:
-  File "game/script.rpy", line 512, in execute
-    vbox:
-  File "game/script.rpy", line 513, in execute
-    viewport draggable True mousewheel True xysize(1920,800):
-  File "game/script.rpy", line 514, in execute
-    grid 8 999:
-  File "game/script.rpy", line 516, in execute
-    for i, numeral index numeral in enumerate(playersLures.fish):
-  File "game/script.rpy", line 518, in execute
-    button action Return(i):
-  File "game/script.rpy", line 519, in execute
-    frame:
-  File "game/script.rpy", line 520, in execute
-    vbox:
-  File "game/script.rpy", line 523, in execute
-    text "$[str(currentFish.price:.2f)]" align(0.5,0.5)
-SyntaxError: invalid syntax (<none>, line 1)
+  File "game/minigame.rpy", line 91, in execute
+    screen minigame:
+  File "game/minigame.rpy", line 91, in execute
+    screen minigame:
+  File "game/minigame.rpy", line 124, in execute
+    timer 0.05 action SetVariable("distance", ((math.dist( (fishingX,5),(fishX,5))) / allowedDistance)*1) repeat True
+  File "game/minigame.rpy", line 124, in keywords
+    timer 0.05 action SetVariable("distance", ((math.dist( (fishingX,5),(fishX,5))) / allowedDistance)*1) repeat True
+  File "game/minigame.rpy", line 124, in <module>
+    timer 0.05 action SetVariable("distance", ((math.dist( (fishingX,5),(fishX,5))) / allowedDistance)*1) repeat True
+ZeroDivisionError: float division by zero
 
 -- Full Traceback ------------------------------------------------------------
 
 Full traceback:
-  File "game/script.rpy", line 495, in script
-    call screen sell_fish
+  File "game/minigame.rpy", line 221, in script
+    call screen minigame
   File "C:\Renpy\renpy-8.2.1-sdk\renpy\ast.py", line 1968, in execute
     self.call("execute")
   File "C:\Renpy\renpy-8.2.1-sdk\renpy\ast.py", line 1950, in call
@@ -62,47 +52,19 @@ Full traceback:
     self.update()
   File "C:\Renpy\renpy-8.2.1-sdk\renpy\display\screen.py", line 697, in update
     self.screen.function(**self.scope)
-  File "game/script.rpy", line 510, in execute
-    screen sell_fish:
-  File "game/script.rpy", line 510, in execute
-    screen sell_fish:
-  File "game/script.rpy", line 512, in execute
-    vbox:
-  File "game/script.rpy", line 513, in execute
-    viewport draggable True mousewheel True xysize(1920,800):
-  File "game/script.rpy", line 514, in execute
-    grid 8 999:
-  File "game/script.rpy", line 516, in execute
-    for i, numeral index numeral in enumerate(playersLures.fish):
-  File "game/script.rpy", line 518, in execute
-    button action Return(i):
-  File "game/script.rpy", line 519, in execute
-    frame:
-  File "game/script.rpy", line 520, in execute
-    vbox:
-  File "game/script.rpy", line 523, in execute
-    text "$[str(currentFish.price:.2f)]" align(0.5,0.5)
-  File "C:\Renpy\renpy-8.2.1-sdk\renpy\text\text.py", line 1738, in __init__
-    self.set_text(text, scope, substitute) # type: ignore
-  File "C:\Renpy\renpy-8.2.1-sdk\renpy\text\text.py", line 1868, in set_text
-    i, did_sub = renpy.substitutions.substitute(i, scope, substitute) # type: ignore
-  File "C:\Renpy\renpy-8.2.1-sdk\renpy\substitutions.py", line 368, in substitute
-    s = interpolate(s, kwargs) # type: ignore
-  File "C:\Renpy\renpy-8.2.1-sdk\renpy\substitutions.py", line 86, in interpolate
-    raise e
-  File "C:\Renpy\renpy-8.2.1-sdk\renpy\substitutions.py", line 78, in interpolate
-    value = renpy.python.py_eval(code, {}, scope)
-  File "C:\Renpy\renpy-8.2.1-sdk\renpy\python.py", line 1207, in py_eval
-    code = py_compile(code, 'eval')
-  File "C:\Renpy\renpy-8.2.1-sdk\renpy\python.py", line 1144, in py_compile
-    raise e
-  File "C:\Renpy\renpy-8.2.1-sdk\renpy\python.py", line 1081, in py_compile
-    raise orig_e
-  File "C:\Renpy\renpy-8.2.1-sdk\renpy\python.py", line 1073, in py_compile
-    tree = compile(source, filename, py_mode, ast.PyCF_ONLY_AST | flags, 1)
-SyntaxError: invalid syntax (<none>, line 1)
+  File "game/minigame.rpy", line 91, in execute
+    screen minigame:
+  File "game/minigame.rpy", line 91, in execute
+    screen minigame:
+  File "game/minigame.rpy", line 124, in execute
+    timer 0.05 action SetVariable("distance", ((math.dist( (fishingX,5),(fishX,5))) / allowedDistance)*1) repeat True
+  File "game/minigame.rpy", line 124, in keywords
+    timer 0.05 action SetVariable("distance", ((math.dist( (fishingX,5),(fishX,5))) / allowedDistance)*1) repeat True
+  File "game/minigame.rpy", line 124, in <module>
+    timer 0.05 action SetVariable("distance", ((math.dist( (fishingX,5),(fishX,5))) / allowedDistance)*1) repeat True
+ZeroDivisionError: float division by zero
 
 Windows-10-10.0.19045 AMD64
 Ren'Py 8.2.1.24030407
 FishLoveMe 0.0
-Thu May  9 13:43:01 2024
+Fri May 10 17:44:39 2024

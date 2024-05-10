@@ -292,7 +292,7 @@ label lophi_questions:
             $askedLophiAbout.append("freshwater")
             jump lophi_questions
         "I'll stop interrogating you now":
-            npc "Kind of you!"
+            npc "Ain't that kind of you!"
             jump lophi_convo
 
 
