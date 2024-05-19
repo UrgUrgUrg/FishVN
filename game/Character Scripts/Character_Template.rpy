@@ -63,7 +63,7 @@ label Lophi_Catch:
         ## create dialogue lines by putting 'npc ' in front of quoted text
     npc "Now just what the fuck do you think you're up to, homie?"
         ## and narration by just adding a line of quoted text on it's own
-    "The anglerfish's lantern glows with an intense red glare, you get the impression being acught on your line put a wrinkle in her day."
+    "The anglerfish's lantern glows with an intense red glare, you get the impression being caught on your line put a wrinkle in her day."
     return
 
 label Lophi_Catch_revisit:
@@ -183,8 +183,7 @@ label Lophi_Talk_50:
     call lophi_convo
     return
 
-init:
-    $lophiGotFat=False ## You can define your own varibles in an 'init' block
+default lophiGotFat=False ## You can define your own varibles in an 'init' block
 
 label Lophi_AcceptGift_50:
     npc "This pampering's starting to affect my damn waistline."
@@ -236,8 +235,7 @@ label Lophi_RejectGift_100:
     ## It makes use of some renpy techniques you might want (but should not feel pressured) to use
     ## in your own script.
 
-init:
-    $askedLophiAbout = []
+default askedLophiAbout = []
         ## ^An uncluttered way of tracking what dialogue choices have already been selected
 
 label lophi_convo:

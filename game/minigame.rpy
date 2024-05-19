@@ -1,15 +1,16 @@
+default fishingTimer = 0
+default fishDepth = 0
+default fishWeight = 400
+default fishingX = 960
+default fishX = 960
+default fishSpeed = 15
+default distance = 0
+default charName = ""
+default correctSide = False
 
 init python:
     import math
-    fishingTimer = 0
-    fishDepth = 0
-    fishWeight = 400
-    fishingX = 960
-    fishX = 960
-    fishSpeed = 15
-    distance = 0
-    charName = ""
-    correctSide = False
+    
 
     class DynamicLine(renpy.Displayable):
 
@@ -24,11 +25,15 @@ init python:
         def render(self, width, height, st, at):
             r = renpy.Render(1920, 1080)
             s = r.canvas()
-            redness = min(255,max(0,(fishDepth/2500)*255))
+            ##blueness = min(255,max(0,(fishDepth/2500)*255))
+            blueness = 50
             greenness=0
+            redness=0
             if (correctSide):
-                greenness = min(255,255*distance)
-            c = (redness,greenness,0)
+                greenness = 255
+            else:
+                redness = 255
+            c = (redness,greenness,blueness)
             t = max(0,2 + 3*distance)
             s.polygon(c, [(max(0,self.x1-t), max(0,self.y1)),(max(1,self.x1+t),max(0,self.y1)),(max(1,self.x2+t),max(1,self.y2)),(max(0,self.x2-t),max(1,self.y2))],0)
 
@@ -114,20 +119,21 @@ screen minigame:
     add "Minigame/Rod.png" xpos fishingX at rodrot
     text "Time: [fishingTimer] \n FishX: [fishX] FishDepth: [fishDepth]\n Tick: [tick] - [reversal]\n Distance: [distance]\n Fishenergy: [fishEnergy] Fish speed: [(fishSpeed+(fishEnergy*0.2))]"
     #gameplay code
-    timer 0.1 action SetVariable("fishDepth", fishDepth+(fishWeight/8)) repeat True
+    timer 0.1 action SetVariable("fishDepth", fishDepth+(fishWeight/15)) repeat True
     timer 0.4 action SetScreenVariable("allowedDistance",(max(30,fishDepth/2500)*1300)) repeat True
     button:
         xsize 1920
         ysize 1080
+        keysym "K_SPACE"
         action SetScreenVariable("reelTimer",5), Play("sound","SFX/Reeling.ogg")
-    timer 0.05 action If(reelTimer>0, SetVariable("fishDepth",max(0,fishDepth-3-(100-fishEnergy)))), SetScreenVariable("reelTimer",reelTimer-1) repeat True
+    timer 0.05 action If(reelTimer>0, SetVariable("fishDepth",max(0,fishDepth-25-(100-fishEnergy)))), SetScreenVariable("reelTimer",reelTimer-1) repeat True
     timer 0.05 action SetVariable("distance", ((math.dist( (fishingX,5),(fishX,5))) / allowedDistance)*1) repeat True
     timer 5.0 action IncrementVariable("fishingTimer", 1) repeat True
     $fishForce=(fishSpeed-(fishEnergy*0.2))
     timer 0.01 action If(reversal is True, SetVariable("fishX",max(max(0,fishingX-allowedDistance),fishX-fishForce)), SetVariable("fishX",min(min(1920,fishingX+allowedDistance),fishX+fishForce))) repeat True
     timer 1.0 action If(renpy.random.randint(0,1)==0,SetScreenVariable("reversal",False),SetScreenVariable("reversal", True)) repeat True
     timer 0.01 action If((reversal==True and (fishX>fishingX)) or (reversal==False and (fishX<fishingX)),SetVariable("correctSide",True),SetVariable("correctSide", False)) repeat True
-    timer 0.01 action If(correctSide,SetScreenVariable("fishEnergy", max(0.0,fishEnergy - (3.0*distance))), SetScreenVariable("fishEnergy", min(100.0,fishEnergy + 0.5))) repeat True
+    timer 0.01 action If(correctSide,SetScreenVariable("fishEnergy", max(0.0,fishEnergy - (11.0*distance))), SetScreenVariable("fishEnergy", min(100.0,fishEnergy + 0.25))) repeat True
     bar:
         value AnimatedValue(value=fishEnergy, range=100, delay=0.1, old_value=None)
         xysize(1000, 50)
@@ -153,12 +159,13 @@ screen failGame:
     ##dismiss action Hide("failGame")
     text "Your line broke!!" size 100 align(0.5, 0.5)
     ## Automatically hides the screen if the player doesn't click within 1.0 second.
-    timer 2.0 action Hide("failGame"), Jump("justFailed"), Play("music","Bossanova.ogg")
+    timer 2.0 action Hide("failGame"), Jump("justFailed")
 
 screen winGame:
     ## When this screen is shown, we hide our mini-game, because the player has already failed at this point! Also resets casting flag to False
     on "show" action Hide("minigame")
-    on "show" action Stop("sound"), Play("sound","SFX/splash.ogg"),Play("music","victory.ogg"), Queue("music","Bossanova.ogg")
+    on "show" action Stop("sound"), Play("sound","SFX/splash.ogg"), Play("sound","victory.ogg",loop=False),PauseAudio("music",True)
+    timer 1.5 action PauseAudio("music",False)
     ## Left click, space, and whatever button player uses to advance game will automatically hide the fail screen.
     ##dismiss action Hide("winGame")
     add DynamicDisplayable(characterCode) at slowzoom:
@@ -166,7 +173,7 @@ screen winGame:
         align (0.5,0.0)
     text "Thou Hath Caught A Fishy" size 100 align(0.5, 0.5)
     ## Automatically hides the screen if the player doesn't click within 1.0 second.
-    timer 3.0 action Hide("winGame"), Jump("caught_character"), Play("music","Bossanova.ogg")
+    timer 3.0 action Hide("winGame"), Jump("caught_character")
 
 label fishing_start:
     if not datingPoolSet:
@@ -181,7 +188,7 @@ label fishing_start:
                                     if not c.dateable:
                                         c.height = c.height/2 + c.height*random.random()
                                         c.weight = c.weight/2 + c.weight*random.random()
-                                        c.price = round((c.weight + c.height)*0.75, 2)
+                                    c.price = round((c.weight + c.height)*0.75, 2)
                                     datingPool.append(c)
                             break
             renpy.random.shuffle(datingPool)
@@ -189,12 +196,13 @@ label fishing_start:
     jump fishing
 
 label justFailed:
+    play music "fishing.ogg"
     $advanceMinutes(fishingTimer)
     "Reattaching line.{w=0.2}.{w=0.2}.{w=0.2}."
     $advanceMinutes(15)
     if not currentCharacter in list(datingPool):
         $datingPool.append(currentCharacter)
-    jump fishingMenu
+    jump fishing_menu
 
 label fishing:
     play sound "SFX/cast.ogg"
@@ -210,10 +218,12 @@ label fishing:
         "You cast your line{w=0.2}.{w=0.2}.{w=0.3}.{w=0.3}.{w=0.4}.\nA bite!"
     else:
         "You cast your line{w=0.2}.{w=0.2}.{w=0.3}.{w=0.3}.{w=0.4}.{w=0.4}.{w=0.4}.\nBut nothing else seems to be biting today. Maybe they're tired of this lure..."
-        jump fishingMenu 
+        jump fishing_menu 
     menu:
         "This catch seems about [str(round(currentCharacter.weight))] lbs"
         "Reel 'em in!":
+            scene bg underwater
+            with dissolve
             # call screen minigame
             if (fishing_settings=="skip"):
                 call screen winGame
@@ -226,41 +236,64 @@ label fishing:
 
 transform throwback:
     transform_anchor True anchor(0.5, 0.5) rotate 0 xzoom 1.0 yzoom 1.0 xoffset 0 yoffset 0
-    linear 1.0 yoffset -600 xzoom 0.5 yzoom 0.5 rotate 700
-    linear 1.0 yoffset 500 xzoom 0.0 yzoom 0.0 rotate 1300
+    linear 0.5 yoffset -400 xzoom 0.5 yzoom 0.5 rotate 700
+    linear 1.0 yoffset -100 xzoom 0.0 yzoom 0.0 rotate 1300
 
 label findLabel(suffix):
-    $i = 0
-    $seenStages = []
-    $unseenStages = []
-    $expressionString = charName+"_"+suffix
     if (not currentCharacter.dateable):
         return
-    while (i <= currentCharacter.affectionLevel):
-        if (renpy.has_label(expressionString+"_"+str(i))):
-            if (not i in list(currentCharacter.stagesSeen)):
-                $unseenStages.append(i)
-            else:
-                $seenStages.append(i)
-        $i += 1
-    
-    if unseenStages:
-        $currentCharacter.stagesSeen.append(unseenStages[0])
-        call expression expressionString+"_"+str(unseenStages[0])
-    else:
-        if seenStages:
-            if renpy.has_label(expressionString+"_"+str(seenStages[-1])+"_revist"):
-                call expression expressionString+"_"+str(seenStages[-1])+"_revist"
-            else:
-                call expression expressionString+"_"+str(seenStages[-1])
-        else:
+    $i = 0
+    $stageQueue = []
+    $expressionString = charName+"_"+suffix
+
+    if (renpy.has_label(expressionString)):
+        if (not expressionString in list(currentCharacter.stagesSeen)):
+            $currentCharacter.stagesSeen.append(expressionString)
             call expression expressionString
+            return
+        else:
+            $stageQueue.append(expressionString)
+
+    while (i <= currentCharacter.affectionLevel):
+        $theString = expressionString+"_"+str(i)
+        if (renpy.has_label(theString)):
+            if (not theString in list(currentCharacter.stagesSeen)):
+                $currentCharacter.stagesSeen.append(theString)
+                call expression theString
+                return
+            else:
+                $stageQueue.append(theString)
+        $i += 1
+    $i=0
+
+    if stageQueue:
+        if renpy.has_label(stageQueue[-1]+"_revisit"):
+            call expression stageQueue[-1]+"_revisit"
+            return
+        else:
+            call expression stageQueue[-1]
+            return
+    else:
+        return
+
+
+        
+
+
     return
+
+init python:
+    affectionMusic = [1,2,5,7,10]
 
 
 label caught_character:
-    scene bg lakeside
+    scene lake
     with dissolve
+    if (currentCharacter.dateable):
+        $musicNum = min(affectionMusic, key=lambda x:abs(x-((currentCharacter.affectionLevel/currentCharacter.max_affection)*10)))
+        play music "affection_level_"+str(musicNum)+".ogg"
+    else:
+        play music "normalfish.ogg"
     $advanceMinutes(fishingTimer)
     $currentCharacter.caughtTimes += 1
     $caughtToday.append(currentCharacter)
@@ -270,14 +303,37 @@ label caught_character:
     $max_affection = currentCharacter.max_affection
     if not currentCharacter in fishyDex:
         $fishyDex.append(currentCharacter)
-    show character at top
+    $clearExpression()
+    show character:
+        align (0.5,0.3)
     with easeinbottom
     call findLabel("Catch")
     jump catch_menu
 
+transform galleryReveal:
+    xzoom 1.0 yzoom 1.0 alpha 0.0 align (0.25,0.1)
+    ease 1.0 alpha 1.0
+    ease 3.0 xzoom 0.5 yzoom 0.5
+
+label check_for_confession:
+    if currentCharacter.dateable:
+        if (currentCharacter.affectionLevel >= currentCharacter.max_affection):
+            if not (charName+"_Confession") in list(currentCharacter.stagesSeen):
+                play music "affection_level_10.ogg"
+                if renpy.has_label(charName+"_Confession"):
+                    call findLabel("Confession")
+                show galleryImage at galleryReveal
+                "You have succesfully reached max affection for [charName]"
+                hide galleryImage
+                with dissolve
+                $currentCharacter.stagesSeen.append(charName+"_Confession")
+    return
+
 label catch_menu:
+    call check_for_confession
     menu char_menu:
         "Talk with [charName]" if not talkedTo:
+            $clearExpression()
             $advanceHours(1)
             $talkedTo=True
             if (currentCharacter.dateable == True):
@@ -285,10 +341,11 @@ label catch_menu:
                     call findLabel("Talk")
                 else:
                     "You and [charName] chat for a while."
-                jump char_menu
+                jump catch_menu
             else:
                 jump blubtalk
         "Give [charName] a gift" if (currentCharacter.dateable == True) and not givenGift:
+            $clearExpression()
             $advanceHours(1)
             $givenGift=True
             if renpy.has_label(charName+"_AcceptGift"):
@@ -297,10 +354,11 @@ label catch_menu:
                 "You offer [charName] a gift"
             "[charName] has accepted your gift"
             $increase_affection(25)
-            jump char_menu
+            jump catch_menu
         "Add [charName] to inventory" if not currentCharacter.dateable:
             hide character
-            with easeinbottom
+            with easeoutbottom
+            play sound "SFX/fishadd.ogg"
             $playersLures.fish.append(currentCharacter)
             jump fishingMenu
         "Throw [charName] back":
@@ -317,10 +375,9 @@ label end_converstion:
     hide character
     with easeinbottom
     $currentCharacter=None
-    jump fishingMenu
+    jump fishing_menu
 
-init:
-    $fish_responses = [
+default fish_responses = [
 "[charName] stares at you blankly",
 "[charName] thrashes about on the end of your line",
 "You're starting to feel kind of sorry for [charName]",
@@ -338,7 +395,7 @@ init:
 "[charName] is actively becoming less wet",
 "[charName] is just not into you"
     ]
-    $fish_pickup = [
+default fish_pickup = [
         "So... swim here often?",
         "I couldn't help but notice the gleam of your scales",
         "You haven't blinked since you saw me... I often have that effect on people",
@@ -359,8 +416,6 @@ init:
 
 
 label blubtalk:
-    show character at top
-    with easeinbottom
     jump blub_menu
 
 label blub_menu:

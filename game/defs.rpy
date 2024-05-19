@@ -14,11 +14,15 @@ image bg sunset = "BG/sunset.jpg"
 image bg water_close = "BG/waterclose.jpg"
 image bg boats = "BG/boats.jpg"
 image bg nightmarket = "BG/nightmarket.jpg"
+image bg underwater = "BG/underwater.jpg"
 
 image fishing gear = "BG_Props/fishing_gear.png"
 
 image baitshop = "UrgNPCs/Trin.png"
 image fishshop = "UrgNPCs/Roro.png"
+image rodShop = "UrgNPCs/Rodney.png"
+image giftShop = "UrgNPCs/Horse.png"
+image blackMarket = "UrgNPCS/Guy.png"
 
 define You = Character("You",color="#ffffff")
 
@@ -37,7 +41,7 @@ define npc = Character("[currentCharacter.name]",color="#52d69f") ## can't figur
 ##
 
 
-init -5 python:
+init -600 python:
     import math
     import random
     ## Defining a `Fish` class with name, weight, height, and price of the fish.
@@ -99,6 +103,22 @@ init -5 python:
             self.traits = traits
             self.image = "Lures/" + self.name + ".png"
 
+    class Gift:
+        def __init__(self, name, description="A gift", traits=["normal"], price=0):
+            self.name = name
+            self.price = price
+            self.description = description
+            self.traits = traits
+            self.image = "Gifts/" + self.name + ".png"
+
+    class Upgrade:
+        def __init__(self, name, description="Fishing rod upgrade", price=0,requires=[]):
+            self.name = name
+            self.price = price
+            self.description = description
+            self.requires = requires
+
+
     ## Defining an `Inventory` class that contains a list of our items and our coins.
     ## We have 2 methods, `addItem` and `sellItem`. Of course we could add more methods, and even allow for stacking of similar typed fishes.
     ## However, since we have varying weight and height, it is best not to stack them in 1 inventory slot.
@@ -109,6 +129,7 @@ init -5 python:
             self.gifts=[]
             self.victims=[]
             self.coins = 0.0
+            self.upgrades = []
 
         ## `addItem` method - does what it's called. It adds the item (in this project, it adds fishes) into our inventory.
         def addItem(self, item):
@@ -118,10 +139,7 @@ init -5 python:
         def sellItem(self, item):
             self.items.remove(item)
             self.coins += item.price
-    
-    def increase_affection(num):
-        currentCharacter.affectionLevel += num
-        renpy.call("affectionIncrease")
+
 
     def obtainSpecialLure():
         playersLures.addItem(currentCharacter.specialLure)
@@ -142,31 +160,23 @@ init -5 python:
 
     #LURES
     Hook = Lure("Hook","A lure that's shaped like a fishing hook, who's horrible idea was that?",0,["normal","crappy"],1.50)
-    Minnow = Lure("Minnow","Less tasty than the real thing but also more sustainable",0,["normal"],12.99)
-    HulaGirl = Lure("Hula Girl","She shimmies! She shakes! She culturally appropriates! Good for hooking especailly horny catches",0,["normal","horny"],99.99)
-    GraphicRasta = Lure("Graphic Rasta","This rastafarian skulls proves you can be cool AND celebrate your faith!",0,["normal","cool"],99.99)
+    Minnow = Lure("Minnow","Less tasty than the real thing but also more sustainable",0,["normal"],5.99)
+    HulaGirl = Lure("Hula Girl","She shimmies! She shakes! She culturally appropriates! Good for hooking especailly horny catches",0,["normal","horny"],29.99)
+    GraphicRasta = Lure("Graphic Rasta","This rastafarian skulls proves you can be cool AND celebrate your faith!",0,["normal","cool"],29.99)
 
     #GIFTS
 
 
-    #fill the character pool with a bunch of junk fish
-    characters = [Trout,Trout,Trout,Perch,Perch,Perch,Clownfish,Clownfish,Banana,Banana,Boot,Boot,iFsh]
-
-    #this will be what's avaible to the player to catch when they start fishing (based on lure used)
-    datingPool = []
-    caughtToday = []
-    fishyDex = []
-
-    ##players starting lures
-    playersLures = Inventory()
-    playersLures.items = [Hook]
-
-    ##bait shop's starting lures
-    baitshopsLures = Inventory()
-    baitshopsLures.items = [Minnow,HulaGirl,GraphicRasta]
-
-    giftshopItems = Inventory()
-    giftshopItems.gifts = []
+    #UPGRADES
+    Auto1 = Upgrade("Motorized Handle","This hands-free reeling solution lets you automatically catch any fish under 2lbs",40.00)
+    Auto2 = Upgrade("Gas-powered Motor","It's Environmentally unfriendly, yes but it's even more unfriendly to fish. Automatically catches anything lighter than 25lbs",60.00,[Auto1])
+    Auto3 = Upgrade("Overclocked Motor","It could explode at any moment, killing you instantly. But before it does that enjoy automatically catching anything lighter than 50lbs",80.00,[Auto1,Auto2])
+    Hook1 = Upgrade("Extra hook","Attatch more hooks to your rod - more hooks means more fish caught in less time (though the hauls will be heavier)",20.00)
+    Hook2 = Upgrade("Extra extra hook","It's just another hook - identical to the last one you bought so why it is more expensive? Blame inflation I guess", 30.00,[Hook1])
+    Hook3 = Upgrade("Frankly Unnecessary Extra Hook","At this point you just need to admit it: You're hooked on hooks and willing to pay any price for your next fix", 45.00,[Hook1,Hook2])
+    Line1 = Upgrade("Reinforced line","Good news: this extra thick line means far less breakages. Bad news: Your remake of The Tingler will have to go on hiatus.", 25.00,[])
+    Line2 = Upgrade("Unbreakable line","Say GOODBYE to lose states FOR GOOD. It's like you don't even care about the effort put into coding that 'your line broke' screen!",50.00,[Line1])
+    Auto4 = Upgrade("Nuclear Fishin' Core","Enough energy to power the whole island put to far better use as a means to automatically catch any haul under 100lbs. The power! THE POWER!",120.00,[Line1,Hook1,Auto1,Auto2,Auto3])
 
     ## Method to generate a random fish from our 3 pools of possible fishes AND add it to our inventory in one go.
     ## To make a new fish, simply:
@@ -178,6 +188,18 @@ init -5 python:
     def getFish():
         fish = renpy.random.choice(characters)
         inventory.addItem(fish)
+
+    datingPool = []
+    caughtToday = []
+    fishyDex = []
+    playersLures = Inventory()
+
+    ##bait shop's starting lures
+    baitshopsLures = Inventory()
+
+    giftshopItems = Inventory()
+
+    rodShopItems = Inventory()
 
     currentCharacter = None
     currentStage = 0
@@ -192,8 +214,11 @@ init -5 python:
 
     playerName="Fisher"
 
-## Our flag, whether or not we are casting our fish... rod... I don't know, I don't fish.
-default casting = False
+    characters=[Trout,Trout,Trout,Perch,Perch,Perch,Clownfish,Clownfish,Banana,Banana,Boot,Boot,iFsh]
+    baitshopsLures.items = [Minnow,HulaGirl,GraphicRasta]
+    rodShopItems.upgrades=[Auto1,Hook1,Line1,Auto2,Hook2,Line2,Auto3,Hook3,Auto4]
+    giftshopItems.gifts = []
+    playersLures.items = [Hook]
 
 init python:
     def characterCode(st,at):
@@ -204,22 +229,41 @@ init python:
             stringo = "Characters/JunkFish/[currentCharacter.name]"
         if currentStage > 0:
             stringo = stringo + "_" + str(currentStage)
-            if currentExpression != "":
-                stringo = stringo + "_" + currentExpression
+        if currentExpression != "":
+            stringo = stringo + "_" + currentExpression
+
         stringo = stringo + ".png"
         return stringo,None
 
+    def galleryImageCode(st,at):
+        global globallll
+        stringo = "Images/Characters/"+currentCharacter.name+"/"+currentCharacter.name+"_Gallery.png"
+        if (not renpy.loadable(stringo)):
+            stringo = "Images/Characters/"+currentCharacter.name+"/"+currentCharacter.name+".png"
+        return stringo, None
+
     def setStage(number):
+        global currentStage
         currentCharacter.stage=number
         currentStage=number
+        renpy.show("character",[expressionChange])
 
     def setExpression(string):
+        global currentCharacter
+        global currentExpression
         currentExpression=string
+        print(currentExpression+" is the current expressionO")
+        renpy.show("character",[expressionChange])
+
 
     def clearExpression():
-        currentExpression=""
+        global currentExpression
+        if (currentExpression!=""):
+            currentExpression=""
+            renpy.show("character",[expressionChange])
 
     def increaseWeight(number):
+        global currentCharacter
         currentCharacter.weight = currentCharacter.weight + number
 
     def lureCode(st,at):
@@ -228,7 +272,10 @@ init python:
         else:
             return "Lures/hook.jpg", None
     
-    
+transform expressionChange:
+    yoffset 0.0
+    linear 0.05 yoffset 10
+    linear 0.1 yoffset 0.0
 ##time of day system
 init -6 python:
     seconds = 21560
@@ -260,6 +307,13 @@ image character = DynamicDisplayable(characterCode)
 
 image lure = DynamicDisplayable(lureCode)
 
+
+image galleryImage = Composite(
+    (1920,1080),
+    (0,0), "interface/HeartBG.jpg",
+    (0,0), DynamicDisplayable(galleryImageCode)
+)
+
 screen clock:
     frame:
         xsize 384
@@ -271,8 +325,8 @@ screen clock:
             timer 1.0 action IncrementVariable("seconds", 1) repeat True
             text "Day [day]" size 30 xalign 0.5
             text "$[playersLures.coins:.2f]" size 25 xalign 0.5
-            $bleh = max(1,len(playersLures.fish)/6)
-            grid 6 bleh:
+            vpgrid cols 10 xalign 0.5 spacing 4 xmaximum 600:
                 for y in playersLures.fish:
-                    add "Minigame/fish.png" xysize(64,24)
+                    add "Minigame/fish.png" xysize( 32 ,12)
+
 

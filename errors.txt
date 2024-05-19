@@ -2,8 +2,9 @@
 errors listed below, and try again.
 
 
-File "game/defs.rpy", line 261: invalid syntax
-        for i in range(chunkAmount)
+File "game/defs.rpy", line 328: 'padding' is not a keyword argument or valid child of the vpgrid statement.
+    vpgrid cols 11 padding (12,4) xalign 0.5 spacing 4:
+                          ^
 
 Ren'Py Version: Ren'Py 8.2.1.24030407
-Fri May 10 17:43:14 2024
+Sun May 19 16:47:45 2024

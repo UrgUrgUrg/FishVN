@@ -12,11 +12,48 @@ transform fadeAway:
     align (0.5,0.5) alpha 1.0
     ease 2.0 alpha 0.0
 
-label affectionIncrease:
-    show text "{size=40}{color=#e64fb3}{b}AFFECTION INCREASED{/b}" with dissolve
-    with Pause(1.5)
-    hide text with dissolve
+init python:
+    def increase_affection(num):
+        global currentCharacter
+        currentCharacter.affectionLevel = currentCharacter.affectionLevel + num
+        renpy.call("increase_affection",currentCharacter.affectionLevel-num,currentCharacter.affectionLevel,currentCharacter.max_affection)
+
+label increase_affection(oldnum,newnum,maxnum):
+    call screen affection_anim(oldnum,newnum,maxnum)
     return
+
+screen affection_anim(oldnum,newnum,maxnum):
+    on "show" action PauseAudio("music",True), Play("sound","jingle.ogg")
+    add "Interface/heart.png" align (0.5,0.1) at heart_enter, heart_beat
+    vbox align(0.5, 0.5):
+        text "{size=40}{color=#e64fb3}{b}AFFECTION INCREASED{/b}" xalign 0.5 at text_enter
+        bar at text_enter:
+            value AnimatedValue(value=newnum, range=maxnum, delay=4.0, old_value=oldnum)
+            xysize(800, 50)
+    timer 5.0 action PauseAudio("music",False), Return()
+
+transform heart_enter:
+    alpha 0.0 xysize (0,0)
+    easein 2.0 xysize (400,400) alpha 1.0
+    pause 1.0
+    easeout 1.0 alpha 0.0 xysize (0,0)
+
+transform text_enter:
+    alpha 0.0 xzoom 0.0
+    easein 2.0 xzoom 1.1 alpha 1.0
+    linear 0.1 xzoom 1.0 alpha 1.0
+    pause 2.0
+    easein 1.0 alpha 0.0
+
+transform heart_beat:
+    xzoom 1.0 yzoom 1.0
+    linear 0.4 xzoom 0.8 yzoom 0.8
+    linear 0.4 xzoom 1.2 yzoom 1.1
+    linear 0.1 xzoom 1.0 yzoom 1.2
+    linear 0.1 xzoom 1.0 yzoom 1.0
+    repeat
+
+
 
 ## A transform to vibrate our text.
 transform vibrate:
@@ -38,6 +75,15 @@ label clockTest:
         "wait an hour":
             $advanceHours(1)
     jump clockTest
+
+default playersLures = playersLures
+default characters = characters
+default giftshopItems = giftshopItems
+default rodShopItems = rodShopItems
+default baitshopsLures = baitshopsLures
+default currentCharacter = currentCharacter
+default datingPool = datingPool
+default caughtToday = caughtToday
 
 label start:
     show screen clock
@@ -78,27 +124,30 @@ label sleep:
     with dissolve
     jump hut
 
-init:
-    $blackMarketUnlocked=False
+default blackMarketUnlocked=False
 
 label town:
     $location="Market"
     play music "market.ogg"
     jump town_menu
 
-init:
-    $rememberLure = 0
+default rememberLure = 0
 
 label fishingMenu:
     scene lake
     with dissolve
+    if (renpy.music.get_playing(channel='music') != "fishing.ogg"):
+        play music "fishing.ogg"
     show fishing gear
     with dissolve
     play sound "SFX/setup.ogg"
-    call check_time
+    jump fishing_menu
+
+label fishing_menu:
     show lure at topleft
     with easeinleft
-    menu fishing_menu:
+    call check_time
+    menu:
         "Select your lure" if not endOfDay:
             $advanceMinutes(10)
             hide lure
@@ -118,13 +167,12 @@ label fishingMenu:
             $advanceMinutes(20)
             play sound "SFX/closechest.ogg"
             jump lakeside
-        "{color=#43f2ff}{size=+20}{b}Start Fishing{/b}{size=-20}" if not endOfDay:
+        "{color=#43f2ff}{size=+20}{k=5}{b}Start Fishing{/b}{/k}{/size}{/color}" if not endOfDay:
             scene bg water_close
             with dissolve
             jump fishing_start
 
-init:
-    $dayProgress = 0
+default dayProgress = 0
 
 label check_time:
     if seconds < 32400:
@@ -140,6 +188,7 @@ label check_time:
                 scene bg boats
                 with dissolve
                 "The islander's 9-to-5 is in full swing, but you manage to peel away from the commercial fishing boats that have started dotting the landscape and find a nice secluded spot."
+                scene bg lake
             $dayProgress=2
     elif second > 68400:
         if dayProgress==2:
@@ -147,6 +196,7 @@ label check_time:
                 scene bg sunset
                 with dissolve
                 "You notice the other fishers begin to pack their gear up as the day draws to a close, it will soon be too dark to fish safely."
+                scene bg lake
             $dayProgress=3
     elif second > 75600:
         if dayProgress==3:
@@ -166,7 +216,7 @@ label lakeside:
     play music "Bossanova.ogg"
     call check_time
     if not endOfDay:
-        scene bg lakeside
+        scene lake
         with dissolve
     menu:
         "Unpack your fishing gear" if not endOfDay:

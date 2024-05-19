@@ -6,13 +6,17 @@ label town_menu:
         "Go back home":
             $advanceMinutes(10)
             jump hut
-        "Vist the bait stall":
+        "Visit {color=#d34036}De Bait Club{/color}":
             jump baitShop
-        "Visit the gift stall":
+        "Visit {color=#b12d2d}Horse Gifts{/color}":
             jump giftShop
-        "Visit the black market" if blackMarketUnlocked:
+        "Visit {color=#53745d}Jam Maker Inn{/color}" if not blackMarketUnlocked:
+            jump jamMaker
+        "Visit {color=#5a5858}the black market{/color}" if blackMarketUnlocked:
             jump blackMarket
-        "Sell your catches":
+        "Visit {color=#17f021}Hot Rods{/color}":
+            jump rodShop
+        "Visit {color=#507888}Roro's Roe Repo{/color}":
             jump fishShop
         "Walk to the lake":
             $advanceMinutes(5)
@@ -205,6 +209,8 @@ label blackMarket:
 ##GIFTS
 
 label giftShop:
+    show giftShop at top
+    with easeinright
     Giftshop "Well howdy, lookin' for that special somethin' for that special someone?"
     Giftshop "This here gift industry's a wild one - so my stock changes purty dang regular. Make sure y'come back daily fir new deals!"
     jump gift_menu
@@ -216,6 +222,8 @@ label gift_menu:
         "Sell gifts":
             jump sellgifts
         "Leave Horse's Gifts":
+            hide giftShop
+            with easeoutright
             jump town
 
 label sellgifts:
@@ -231,6 +239,116 @@ label sellgifts:
 
 label buygifts:
     jump town
+
+init:
+    $rodneyfixrod=False
+
+label rodShop:
+    show rodShop at top
+    with easeinright
+    if (rodneyfixrod==False):
+        call rodney_fix
+    else:
+        "Rodney gives you a silent nod as your approach."
+    jump rodShop_menu
+
+label rodShop_menu:
+    menu:
+        "Upgrade your fishing rod":
+            call screen rod_shop
+            if _return == -1:
+                pass
+            else:
+                $selectedUpgrade = rodShopItems.upgrades[_return]
+                $playersLures.coins = playersLures.coins - selectedUpgrade.price
+                $rodShopItems.coins = rodShopItems.coins + selectedUpgrade.price
+                $playersLures.upgrades.append(selectedUpgrade)
+                $rodShopItems.upgrades.remove(selectedUpgrade)
+                play sound "SFX/upgrade.ogg"
+                "Rodney nods and grabs her tools..{w=0.2}.{w=0.2}.{w=0.2}.{w=0.2}."
+                $advanceHours(1)
+                play sound "victory.ogg"
+                "After an hour or so's wait - you have your new upgrade!"
+            jump rodShop_menu
+        "Leave":
+            show rodShop
+            with easeoutright
+            jump town
+
+label rodney_fix:
+    "The strikingly dressed young woman before you narrows her eyes and beckons for you to hand over your fishing rod."
+    menu:
+        "Um... Okay":
+            "The woman takes your fishing rod in hand and, almost quicker than you can register, dismantles it into more pieces than you'd considered such a simple-looking tool could have."
+            "You watch in fascination as she picks up each piece and asseses it, weighing some in her hands, holding a few to her ear.\nIt's as if her and the machinery are having a conversation you can't understand."
+            "Seemingly satisfied, the woman puts your rod back together and gives the handle a satisfyingly smooth spin - it doesn't seem like the problem with it jamming is ever going to come back."
+            "She hands your rod back to you proudly."
+            menu:
+                "Thanks":
+                    "The woman nods. She then points to a sign that lists the fishing rod upgrades she offers and their prices, you guess that's how she actually make her money."
+                "Thanks, um... how much do I owe you?":
+                    "The woman shakes her head. Clearly she considers such a simple fix unworthy of payment."
+                    "She then points to a sign that lists the fishing rod upgrades she offers and their prices, you guess that's how she does make her money."
+            $rodneyfixrod=True
+        "*Decline giving it to her*":
+            "The woman shrugs and goes back to her tinkering"
+    return
+
+
+screen rod_shop:
+    default selectedUpgrade = -1
+    frame align (0.5,0.5) xysize (1200,750) padding (20,10):
+        hbox xalign 0.5:
+            vbox yalign 0.5:
+                text "Rodney's Rod Upgrades"
+                null height 25
+                for i, numeral index numeral in enumerate(rodShopItems.upgrades):
+                    button hovered SetScreenVariable("selectedUpgrade", i) action SetScreenVariable("selectedUpgrade",i):
+                        if (selectedUpgrade==i):
+                            text "[rodShopItems.upgrades[i].name] - {b}$[rodShopItems.upgrades[i].price:.2f]{/b}" color "#ffffff" size 20
+                        else:
+                            text "[rodShopItems.upgrades[i].name] - $[rodShopItems.upgrades[i].price:.2f]" color "#45f04d" size 20
+            vbox:
+                add "Interface/rod/RodSpin0.png" align (0.5,0.5) at rod_spinning
+                if (selectedUpgrade > -1):
+                    viewport xysize(500,75) draggable True mousewheel True:
+                        vbox:
+                            text "[rodShopItems.upgrades[selectedUpgrade].description]" size 15
+                            text "REQUIRES:" size 18
+                            for y, numeral index numeral in enumerate(rodShopItems.upgrades[selectedUpgrade].requires):
+                                if (rodShopItems.upgrades[selectedUpgrade].requires[y] in list(playersLures.upgrades)):
+                                    text "[rodShopItems.upgrades[selectedUpgrade].requires[y].name]" color "#45f04d" size 13
+                                else:
+                                    text "[rodShopItems.upgrades[selectedUpgrade].requires[y].name]" color "#c70b0b" size 13
+                    hbox xalign 0.5:
+                        if (playersLures.coins >= rodShopItems.upgrades[selectedUpgrade].price):
+                            textbutton "Buy Upgrade" action Return(selectedUpgrade)
+                        else:
+                            textbutton "Buy Upgrade"
+                        textbutton "Exit" action Return(-1)
+
+transform rod_spinning:
+    "Interface/rod/RodSpin0.png"
+    pause 0.1
+    "Interface/rod/RodSpin1.png"
+    pause 0.1
+    "Interface/rod/RodSpin2.png"
+    pause 0.1
+    "Interface/rod/RodSpin3.png"
+    pause 0.1
+    "Interface/rod/RodSpin4.png"
+    pause 0.1
+    "Interface/rod/RodSpin5.png"
+    pause 0.1
+    "Interface/rod/RodSpin6.png"
+    pause 0.1
+    "Interface/rod/RodSpin7.png"
+    pause 0.1
+    "Interface/rod/RodSpin8.png"
+    pause 0.1
+    "Interface/rod/RodSpin9.png"
+    pause 0.1
+    repeat        
 
 
     
