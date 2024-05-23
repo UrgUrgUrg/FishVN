@@ -10,8 +10,6 @@ init python:
     creatorUrl="https://crayondrawlings.neocities.org"
   )
 
-  characters.append(Barbie)
-
 label Barbie_Catch:
   npc "Well g'day!"
   npc "Would you mind nipping to the bottleo and picking me up a couple of tinnies? I'd owe ya!"

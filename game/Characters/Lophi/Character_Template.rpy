@@ -1,6 +1,5 @@
 init python:
 ## Define your characters stats, 
-
     Lophi = Fish(
         name="Lophi",
             ## ^ Your character's name, your below labels must use this
@@ -24,15 +23,11 @@ init python:
             ## ^ Bio info about you
     )
     
-    characters.append(Lophi)
-        ## ^This bit of code's's super important as it adds your Fish() object to the game's characters, make sure your character's object name gets added in place of 'Lophi' here
-
     #characters = [Lophi]
         ### ^ Uncomment the code above to make lophi the game's ONLY character - this will be super helpful for testing!
 
 default lophiGotFat=False
     ## ^ feel free to define other variables you want to keep track of
-
 
 ## Below you can use Renpy labels to create scenes with your character, their naming convention is
 ##important!

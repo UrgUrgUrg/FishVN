@@ -44,10 +44,14 @@ define npc = Character("[currentCharacter.name]",color="#52d69f") ## can't figur
 init -600 python:
     import math
     import random
+
+    characters=[]
+
     ## Defining a `Fish` class with name, weight, height, and price of the fish.
     ## Price of the fish is equivalent to the weight divided by 2 times the height
     class Fish:
-        def __init__(self, name, weight, height, description="This dumb fish isn't sexy AT ALL", dateable=True, max_affection=0, nameColor="#fff", lureTraits=["normal"], giftTraits=[], specialLure=None, negativeTraits=["crappy"],creator="",creatorUrl=""):
+        def __init__(self, name, weight=160.00, height=5.2, description="This dumb fish isn't sexy AT ALL", dateable=True, max_affection=100, nameColor="#fff", lureTraits=["normal"], giftTraits=[], specialLure=None, commonality=1,negativeTraits=["crappy"],creator="",creatorUrl=""):
+            global characters
             self.name = name
             if (dateable):
                 self.weight = weight
@@ -77,6 +81,10 @@ init -600 python:
             self.creator = creator
             self.creatorUrl = creatorUrl
             self.stagesSeen = []
+            self.unlocked_traits=[]
+            self.commonality=commonality
+            for i in range(self.commonality):
+                characters.append(self)
 
     caught_times = 1
     affection_level = 2
@@ -94,23 +102,29 @@ init -600 python:
         elif traitToGet==stage:
             return currentCharacter.stage
 
+    baseLures=[]
     class Lure:
         def __init__(self, name, description="A lure", uses=0, traits=["normal"], price=0):
+            global baseLures
             self.name = name
             self.price = price
             self.description = description
             self.uses = uses
             self.traits = traits
             self.image = "Lures/" + self.name + ".png"
+            baseLures.append(self)
 
+    baseGifts = []
     class Gift:
         def __init__(self, name, description="A gift", traits=["normal"], price=0.99, alt_names=[]):
+            global baseGifts
             self.name = name
             self.price = price
             self.description = description
             self.traits = traits
             self.image = "Gifts/" + self.name + ".png"
             self.alt_names = alt_names
+            baseGifts.append(self)
 
     class Upgrade:
         def __init__(self, name, description="Fishing rod upgrade", price=0,requires=[]):
@@ -118,7 +132,7 @@ init -600 python:
             self.price = price
             self.description = description
             self.requires = requires
-
+            
 
     ## Defining an `Inventory` class that contains a list of our items and our coins.
     ## We have 2 methods, `addItem` and `sellItem`. Of course we could add more methods, and even allow for stacking of similar typed fishes.
@@ -152,12 +166,12 @@ init -600 python:
     inventory = Inventory()
 
     ##JUNK FISH
-    Trout = Fish("Trout",2.0,2.0,dateable=False)
-    Perch = Fish("Perch",2.0,2.0,dateable=False)
-    Clownfish = Fish("Clown Fish",2,2,dateable=False,description="Marine biology fact: Not actually funny.")
-    Banana = Fish("Banana Squid",0.8,0.6,dateable=False,description="One slippery customer.")
-    Boot = Fish("Sole",2.4,0.8,dateable=False,description="Has a uniquely leathery texture.")
-    iFsh = Fish("iFsh",69.9,3.6,dateable=False,description="A fish with no eyes but one incredibly swish and contemporary 'i'")
+    Trout = Fish("Trout",2.0,2.0,dateable=False,commonality=3)
+    Perch = Fish("Perch",2.0,2.0,dateable=False,commonality=3)
+    Clownfish = Fish("Clown Fish",2,2,dateable=False,description="Marine biology fact: Not actually funny.",commonality=3)
+    Banana = Fish("Banana Squid",0.8,0.6,dateable=False,description="One slippery customer.",commonality=2)
+    Boot = Fish("Sole",2.4,0.8,dateable=False,description="Has a uniquely leathery texture.",commonality=2)
+    iFsh = Fish("iFsh",69.9,3.6,dateable=False,description="A fish with no eyes but one incredibly swish and contemporary 'i'",commonality=2)
 
     #LURES
     Hook = Lure("Hook","A lure that's shaped like a fishing hook, who's horrible idea was that?",0,["normal","crappy"],1.50)
@@ -176,6 +190,9 @@ init -600 python:
     Console = Gift("Game Console","Okay so it's a knock-off product - but it's not like it's going to work underwater anyway! It's the gesture that counts!",["tech","media"],399.00,["Fintendo Switch","Breemdeck","Place-station 5","X-Lox"])
     Plushy = Gift("Plushy","A cute and cuddly lil so-and-so",["cute","soft"],15.99)
     Kitchenware = Gift("Kitchen Gadget","Just don't buy so many of these that you also end up needing a bigger kitchen",["homeware","tech","cooking"],104.78,["Air Fryer","Spiralizer","Coffee Machine","Bao Bun Steamer","Rice Cooker","Slow Cooker","Smoothie Maker","Mixer","Wine Fridge"])
+    CostumeNecklace = Gift("Costume Necklace","Pretty but might dissolve once submerged",["pretty","jewellery","shiny"],29.99)
+    DiamondNecklace = Gift("Diamond Necklace","An Eye-wateringly expensive extravagence.",["pretty","jewellery","shiny","valuable"], 3455.00)
+    
 
     #UPGRADES
     Auto1 = Upgrade("Motorized Handle","This hands-free reeling solution lets you automatically catch any fish under 2lbs",40.00)
@@ -224,7 +241,7 @@ init -600 python:
 
     playerName="Fisher"
 
-    characters=[Trout,Trout,Trout,Perch,Perch,Perch,Clownfish,Clownfish,Banana,Banana,Boot,Boot,iFsh]
+
     baitshopsLures.items = [Minnow,HulaGirl,GraphicRasta]
     rodShopItems.upgrades=[Auto1,Hook1,Line1,Auto2,Hook2,Line2,Auto3,Hook3,Auto4]
     giftshopItems.gifts = [Candy,Chips,Apple,BananaFruit,DVD,Console,Lager,ImportLager,Plushy,Kitchenware]
@@ -247,9 +264,9 @@ init python:
 
     def galleryImageCode(st,at):
         global globallll
-        stringo = "Images/Characters/"+currentCharacter.name+"/"+currentCharacter.name+"_Gallery.png"
+        stringo = "Characters/"+currentCharacter.name+"/"+currentCharacter.name+"_Gallery.png"
         if (not renpy.loadable(stringo)):
-            stringo = "Images/Characters/"+currentCharacter.name+"/"+currentCharacter.name+".png"
+            stringo = "Characters/"+currentCharacter.name+"/"+currentCharacter.name+".png"
         return stringo, None
 
     def setStage(number):

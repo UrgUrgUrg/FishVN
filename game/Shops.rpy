@@ -208,6 +208,11 @@ label blackMarket:
 
 ##GIFTS
 
+init python:
+    def getDailyGifts():
+        renpy.random.shuffle(baseGifts)
+        return baseGifts[1:10]
+
 label giftShop:
     show giftShop at top
     with easeinright

@@ -184,13 +184,11 @@ label fishing_start:
                     for lt in currentLure.traits:
                         if t==lt:
                             if (not c in caughtToday):
-                                if (not c in datingPool):
-                                    if not c.dateable:
-                                        c.height = c.height/2 + c.height*random.random()
-                                        c.weight = c.weight/2 + c.weight*random.random()
-                                    c.price = round((c.weight + c.height)*0.75, 2)
-                                    datingPool.append(c)
-                            break
+                                if not c.dateable:
+                                    c.height = c.height/2 + c.height*random.random()
+                                    c.weight = c.weight/2 + c.weight*random.random()
+                                c.price = round((c.weight + c.height)*0.75, 2)
+                                datingPool.append(c)
             renpy.random.shuffle(datingPool)
         $datingPoolSet=True
     jump fishing
@@ -237,14 +235,14 @@ label fishing:
 transform throwback:
     transform_anchor True anchor(0.5, 0.5) rotate 0 xzoom 1.0 yzoom 1.0 xoffset 0 yoffset 0
     linear 0.5 yoffset -700 xzoom 0.5 yzoom 0.5 rotate 700
-    linear 1.0 yoffset -100 xzoom 0.0 yzoom 0.0 rotate 1300
+    linear 1.0 yoffset -200 xzoom 0.0 yzoom 0.0 rotate 1300
 
 label findLabel(suffix):
     if (not currentCharacter.dateable):
         return
     $i = 0
     $stageQueue = []
-    $expressionString = charName+"_"+suffix
+    $expressionString = charName.replace(" ", "_")+"_"+suffix
 
     if (renpy.has_label(expressionString)):
         if (not expressionString in list(currentCharacter.stagesSeen)):
@@ -290,13 +288,16 @@ label caught_character:
     scene lake
     with dissolve
     if (currentCharacter.dateable):
-        $musicNum = min(affectionMusic, key=lambda x:abs(x-((currentCharacter.affectionLevel/currentCharacter.max_affection)*10)))
+        $caughtToday.append(currentCharacter) ##cant catch twice in one day even if you switch lures
+        if currentCharacter.affectionLevel>0:
+            $musicNum = min(affectionMusic, key=lambda x:abs(x-((currentCharacter.affectionLevel/currentCharacter.max_affection)*10)))
+        else:
+            $musicNum = affectionMusic[0]
         play music "affection_level_"+str(musicNum)+".ogg"
     else:
         play music "normalfish.ogg"
     $advanceMinutes(fishingTimer)
     $currentCharacter.caughtTimes += 1
-    $caughtToday.append(currentCharacter)
     $talkedTo=False
     $givenGift=False
     $affection_level = currentCharacter.affectionLevel

@@ -2,9 +2,9 @@
 errors listed below, and try again.
 
 
-File "game/Shops.rpy", line 347: vbox expects a non-empty block.
-    if (perc>0):
-                ^
+File "game/defs.rpy", line 180: invalid syntax
+    Costume Necklace = Gift("Pretty but might dissolve once submerged",["pretty","jewellery","shiny"],29.99)
+             ^
 
 Ren'Py Version: Ren'Py 8.2.1.24030407
-Thu May 23 08:45:51 2024
+Thu May 23 10:07:26 2024

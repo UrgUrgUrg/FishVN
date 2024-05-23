@@ -87,10 +87,12 @@ default caughtToday = caughtToday
 
 label start:
     show screen clock
+    $characters.remove(MyCoolFish) ##So we don't actually see the super barebones example character
     $playersLures.addItem(GraphicRasta)
     $playersLures.addItem(HulaGirl)
     $playersLures.addItem(Minnow)
     $currentLure = playersLures.items[-1]
+    $giftshopItems.gifts=getDailyGifts()
     jump hut
 
 label hut:
@@ -118,6 +120,7 @@ label sleep:
     $caughtToday=[]
     $dayProgress=0
     $day += 1
+    $giftshopItems.gifts=getDailyGifts()
     "Zzz"
     play sound "SFX/alarmclock.ogg"
     scene hut
@@ -152,10 +155,10 @@ label fishing_menu:
             $advanceMinutes(10)
             hide lure
             with easeinleft
+            $rememberLure = currentLure
             call screen lure_select
             $currentLure = playersLures.items[_return]
-            if (rememberLure != _return):
-                $remberLure = _return
+            if (rememberLure != currentLure):
                 $datingPoolSet=False
                 "You have equipped [currentLure.name]"
             else:
