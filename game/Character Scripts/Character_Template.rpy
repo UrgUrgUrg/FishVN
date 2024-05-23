@@ -30,16 +30,15 @@ init python:
     #characters = [Lophi]
         ### ^ Uncomment the code above to make lophi the game's ONLY character - this will be super helpful for testing!
 
-init:
-    $lophiGotFat=False
-##feel free to define other varaibles you want to keep track of
+default lophiGotFat=False
+    ## ^ feel free to define other variables you want to keep track of
 
 
 ## Below you can use Renpy labels to create scenes with your character, their naming convention is
 ##important!
 ## the structure of them is:
 
-## Charactername_Catch - what character say to you when they emmerge from the water
+## Charactername_Catch - what characters say to you when they emmerge from the water
 ## Charactername_Talk - what happens when the player selects the 'Talk to' option
 ## Charactername_AcceptGift - what happens when a player chooses 'give gift to' and selects a gift the character likes
 ## Charactername_RejectGift - what happens when a character doesn't like a gift
@@ -182,8 +181,6 @@ label Lophi_Talk_50:
     npc "Whachu wanna ask me, holmes?"
     call lophi_convo
     return
-
-default lophiGotFat=False ## You can define your own varibles in an 'init' block
 
 label Lophi_AcceptGift_50:
     npc "This pampering's starting to affect my damn waistline."

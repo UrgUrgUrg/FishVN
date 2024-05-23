@@ -104,12 +104,13 @@ init -600 python:
             self.image = "Lures/" + self.name + ".png"
 
     class Gift:
-        def __init__(self, name, description="A gift", traits=["normal"], price=0):
+        def __init__(self, name, description="A gift", traits=["normal"], price=0.99, alt_names=[]):
             self.name = name
             self.price = price
             self.description = description
             self.traits = traits
             self.image = "Gifts/" + self.name + ".png"
+            self.alt_names = alt_names
 
     class Upgrade:
         def __init__(self, name, description="Fishing rod upgrade", price=0,requires=[]):
@@ -161,11 +162,20 @@ init -600 python:
     #LURES
     Hook = Lure("Hook","A lure that's shaped like a fishing hook, who's horrible idea was that?",0,["normal","crappy"],1.50)
     Minnow = Lure("Minnow","Less tasty than the real thing but also more sustainable",0,["normal"],5.99)
-    HulaGirl = Lure("Hula Girl","She shimmies! She shakes! She culturally appropriates! Good for hooking especailly horny catches",0,["normal","horny"],29.99)
-    GraphicRasta = Lure("Graphic Rasta","This rastafarian skulls proves you can be cool AND celebrate your faith!",0,["normal","cool"],29.99)
+    HulaGirl = Lure("Hula Girl","She shimmies! She shakes! She culturally appropriates! Good for hooking especially horny catches",0,["normal","horny"],29.99)
+    GraphicRasta = Lure("Graphic Rasta","This rastafarian skull proves you can be cool AND celebrate your faith!",0,["normal","cool"],29.99)
 
     #GIFTS
-
+    Candy = Gift("Box Of Candy","a selection of chocolates - the box is in the shape of a heart in honour of the organ chocolate does the most damage to.",["edible","sweet","romantic","chocolate"],6.99)
+    Chips = Gift("Bag Of Chips","For the potential partner who's already 'all that'",["edible","savoury","casual","chips"],2.99)
+    Apple = Gift("Apple","Use to attract teachers and repel doctors",["edible","sweet","healthy","fruit"],1.23)
+    BananaFruit = Gift("Banana","I don't WANT to write the 'appeal' joke but there's just no way aRIND it",["edible","sweet","healthy","fruit"],0.58)
+    Lager = Gift("Can Of Lager","Makes a satisfying noise when opened",["beer","alcohol","casual"],1.81)
+    ImportLager = Gift("Can of Imported Lager","WHERE was it imported from? Does it matter, it costs more and is therefore a better gift!",["beer","alcohol","fancy"],3.46)
+    DVD = Gift("Digital Versatile Disc","Wait, they still make these?",["media"],4.99)
+    Console = Gift("Game Console","Okay so it's a knock-off product - but it's not like it's going to work underwater anyway! It's the gesture that counts!",["tech","media"],399.00,["Fintendo Switch","Breemdeck","Place-station 5","X-Lox"])
+    Plushy = Gift("Plushy","A cute and cuddly lil so-and-so",["cute","soft"],15.99)
+    Kitchenware = Gift("Kitchen Gadget","Just don't buy so many of these that you also end up needing a bigger kitchen",["homeware","tech","cooking"],104.78,["Air Fryer","Spiralizer","Coffee Machine","Bao Bun Steamer","Rice Cooker","Slow Cooker","Smoothie Maker","Mixer","Wine Fridge"])
 
     #UPGRADES
     Auto1 = Upgrade("Motorized Handle","This hands-free reeling solution lets you automatically catch any fish under 2lbs",40.00)
@@ -217,7 +227,7 @@ init -600 python:
     characters=[Trout,Trout,Trout,Perch,Perch,Perch,Clownfish,Clownfish,Banana,Banana,Boot,Boot,iFsh]
     baitshopsLures.items = [Minnow,HulaGirl,GraphicRasta]
     rodShopItems.upgrades=[Auto1,Hook1,Line1,Auto2,Hook2,Line2,Auto3,Hook3,Auto4]
-    giftshopItems.gifts = []
+    giftshopItems.gifts = [Candy,Chips,Apple,BananaFruit,DVD,Console,Lager,ImportLager,Plushy,Kitchenware]
     playersLures.items = [Hook]
 
 init python:
@@ -243,6 +253,7 @@ init python:
         return stringo, None
 
     def setStage(number):
+        global currentCharacter
         global currentStage
         currentCharacter.stage=number
         currentStage=number

@@ -236,7 +236,7 @@ label fishing:
 
 transform throwback:
     transform_anchor True anchor(0.5, 0.5) rotate 0 xzoom 1.0 yzoom 1.0 xoffset 0 yoffset 0
-    linear 0.5 yoffset -400 xzoom 0.5 yzoom 0.5 rotate 700
+    linear 0.5 yoffset -700 xzoom 0.5 yzoom 0.5 rotate 700
     linear 1.0 yoffset -100 xzoom 0.0 yzoom 0.0 rotate 1300
 
 label findLabel(suffix):
@@ -329,6 +329,8 @@ label check_for_confession:
                 $currentCharacter.stagesSeen.append(charName+"_Confession")
     return
 
+default giftsGiven = []
+
 label catch_menu:
     call check_for_confession
     menu char_menu:
@@ -344,17 +346,28 @@ label catch_menu:
                 jump catch_menu
             else:
                 jump blubtalk
-        "Give [charName] a gift" if (currentCharacter.dateable == True) and not givenGift:
+        "Give [charName] a gift" if (currentCharacter.dateable == True) and not givenGift and list(playersLures.gifts):
             $clearExpression()
-            $advanceHours(1)
-            $givenGift=True
-            if renpy.has_label(charName+"_AcceptGift"):
-                call findLabel("AcceptGift")
+            call screen gift_select(playersLures.gifts,True)
+            if _return!=["horace"]:
+                $giftsGiven = _return
+                $advanceHours(1)
+                $givenGift=True
+                $renpy.random.shuffle(currentCharacter.giftTraits)
+                $giftAccepted=False
+                python:
+                    for i in list(currentCharacter.giftTraits):
+                        for y in giftsGiven[0].traits:
+                            if y==i:
+                                giftAccepted=True
+                $lenno = len(giftsGiven)
+                "You offer [charName] a gift ([giftsGiven[0].name] x [lenno])"
+                if giftAccepted:
+                    jump gift_accept
+                else:
+                    jump gift_reject
             else:
-                "You offer [charName] a gift"
-            "[charName] has accepted your gift"
-            $increase_affection(25)
-            jump catch_menu
+                jump catch_menu
         "Add [charName] to inventory" if not currentCharacter.dateable:
             hide character
             with easeoutbottom
@@ -363,6 +376,25 @@ label catch_menu:
             jump fishingMenu
         "Throw [charName] back":
             jump end_converstion
+
+label gift_accept:
+    if renpy.has_label(charName+"_AcceptGift"):
+        call findLabel("AcceptGift")
+    "[charName] has accepted your gift"
+    python:
+        for g in list(giftsGiven):
+            playersLures.gifts.remove(g)
+    $increase_affection(round(giftsGiven[0].price * len(giftsGiven)))
+    $giftsGiven=[]
+    jump catch_menu
+
+label gift_reject:
+    if renpy.has_label(charName+"_RejectGift"):
+        call findLabel("RejectGift")
+    "[charName] has rejected your gift"
+    $increase_affection(2)
+    $giftsGiven=[]
+    jump catch_menu
 
 label end_converstion:
     play sound "SFX/whoosh.ogg"

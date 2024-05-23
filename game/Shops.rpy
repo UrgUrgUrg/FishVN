@@ -178,7 +178,7 @@ label sell_all_fish:
     jump town
 
 screen sell_fish(list_used):
-    dismiss action Return(-1)
+    dismiss action Return(-2)
     vbox:
         viewport draggable True mousewheel True xysize(1920,850):
                 grid 8 999:
@@ -217,6 +217,9 @@ label giftShop:
 
 label gift_menu:
     menu:
+        "Get all the money":
+            $playersLures.coins+=1000000
+            jump gift_menu
         "Buy gifts":
             jump buygifts
         "Sell gifts":
@@ -237,11 +240,131 @@ label sellgifts:
         Giftshop "I'll make sure it finds a good home."
     jump gift_menu
 
-label buygifts:
-    jump town
+init python:
 
-init:
-    $rodneyfixrod=False
+    def applyBulkDiscount(item,quantity):
+        price = item.price
+        fullPrice = (price*quantity)
+        if quantity>1:
+            reduction = max(0,quantity/100)
+        else:
+            reduction=0
+        totalCost = fullPrice - min(fullPrice*0.5, fullPrice*reduction)
+        return round(min(fullPrice, totalCost),2)
+
+    def itemsInCart(item,quantity):
+        i=0
+        aList = []
+        while i < quantity:
+            aList.append(item)
+            i += 1
+        return aList
+
+
+label buygifts:
+    call screen gift_select
+    if _return!=["horace"]:
+        $advanceMinutes(10)
+        play sound "SFX/cash.ogg"
+        $itemsBought = _return
+        $amountBought = len(list(_return))
+        $playersLures.gifts.extend(itemsBought)
+        $discountedAmount = applyBulkDiscount(itemsBought[0],len(itemsBought))
+        $playersLures.coins -= discountedAmount
+        $giftshopItems.coins += discountedAmount
+        "You bought [amountBought]x [itemsBought[0].name]"
+    else:
+        jump gift_menu
+    jump buygifts
+
+init python:
+    def getItemName(itemUsed):
+        return n.name
+
+    def countDuplicates(list_used):
+        new_list=[]
+        for i in set(list_used):
+                count = list(list_used).count(i)
+                new_list.append([i,count])
+        return new_list
+
+screen gift_select(inventoryToUse=giftshopItems.gifts,isGiving=False):
+    default inventory = countDuplicates(inventoryToUse)
+    default currentHovered = inventory[0][0]
+    default currentHovverBovver = inventory[0][0]
+    default quantity = 1
+    default totalCost = currentHovered.price
+    default shoppingCart = []
+    default maxQuantity = 99
+    dismiss action Return(["horace"])
+    hbox align (0.5, 0.5) spacing 10:
+        viewport draggable True xysize(600,900) mousewheel True:
+            vbox spacing 13:
+                for i in list(inventory):
+                    $theItem = i[0]
+                    $theCount = i[1]
+                    if (isGiving):
+                        $inStock = "("+str(theCount)+")"
+                    else:
+                        $inStock=""
+                    button action SetScreenVariable("currentHovered", theItem), If(isGiving, SetScreenVariable("maxQuantity",theCount),SetScreenVariable("maxQuantity",100)),SetScreenVariable("quantity",1) hovered SetScreenVariable("currentHovverBovver",theItem):
+                        fixed ysize 30:
+                            frame xfill True:
+                                vbox:
+                                    if (currentHovered==theItem):
+                                        text "[theItem.name] - $[theItem.price] [inStock]" size 25 color "#dfdc2b"
+                                    else:
+                                        text "[theItem.name] - $[theItem.price] [inStock]" size 20 color "#fff"
+                                    if (currentHovverBovver==theItem):
+                                        hbox spacing 3:
+                                            for y in list(theItem.traits):
+                                                if y==theItem.traits[-1]:
+                                                    text "[y]" color "#dfdc2b" size 12
+                                                else:
+                                                    text "[y]," color "#dfdc2b" size 12
+        frame xysize(600,900) padding (35,10):
+            vbox:
+                text "{u}[currentHovered.name]{/u}" xalign 0.5
+                null height 10
+                viewport ysize 250 draggable True mousewheel True:
+                    text "[currentHovered.description]" size 25
+                text "Gift traits:" size 20
+                vpgrid cols 3 transpose False ysize 250:
+                    for t in list(currentHovered.traits):
+                        fixed xsize 150 ysize 20:
+                            text "  • [t]" size 20 color "#dfdc2b"
+                null height 10
+                vbox spacing 15:
+                    fixed ysize 40:
+                        bar value ScreenVariableValue('quantity',maxQuantity,action=SetScreenVariable('totalCost',applyBulkDiscount(currentHovered,quantity)))
+                        if (quantity>3) and (not isGiving):
+                            text "{s}{size=12}{color=#d62727}$[currentHovered.price*quantity:.2f]{/color}{/size}{/s} $[totalCost:.2f]" xalign 0.5
+                        else:
+                            text "$[totalCost:.2f]" xalign 0.5
+                    if (quantity>3) and (not isGiving):
+                        $perc = 100 - round((totalCost/(currentHovered.price*quantity))*100)
+                        if (perc>0):
+                            text "Bulk Discount: -[perc]%" size 15 xalign 0.5
+                    vbox xalign 0.5:
+                        if (totalCost <= playersLures.coins):
+                            button action Return(itemsInCart(currentHovered,quantity)) xalign(0.5):
+                                frame:
+                                    if isGiving:
+                                        text "Give x [quantity] [currentHovered.name]"
+                                    else:
+                                        text "Buy x [quantity] [currentHovered.name]"
+                        else:
+                            text "Over-budget" color "#d62727"
+                        button action Return(["horace"]) xalign 0.5:
+                                frame:
+                                    text "Exit"
+                        
+
+
+
+
+
+default rodneyfixrod=False
 
 label rodShop:
     show rodShop at top

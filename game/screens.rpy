@@ -103,16 +103,18 @@ screen say(who, what):
         xalign 0.5
         padding (20,0)
         xmaximum 1000
+        ymaximum 1080
         if renpy.get_screen("choice"):
             yoffset -(65*dialogueOffset)
         else:
             yoffset -25
         vbox:
-            if who is not None:
-                    text who id "who" xalign 0.1
-                    null height 20
-            text what id "what"
-            null height 60
+            hbox:
+                if who is not None:
+                        text who+":   " id "who" xalign 0.1 yalign 0.05 at namebob
+                text what id "what" yalign 0.5
+            text " "
+         
 
     ## If there's a side image, display it above the text. Do not display on the
     ## phone variant - there's no room.
@@ -120,9 +122,9 @@ screen say(who, what):
         add SideImage() xalign 0.0 yalign 1.0
 
 transform namebob:
-    yoffset 10 alpha 0.0
-    easeout 0.5 yoffset -2 alpha 1.0
-    ease 0.2 yoffset 0
+    yoffset 10 alpha 0.5
+    easeout 0.25 yoffset -2 alpha 1.0
+    ease 0.25 yoffset 0
 
 
 ## Make the namebox available for styling through the Character object.
@@ -142,7 +144,7 @@ style window:
     xalign 0.5
     xfill False
     xsize 1000
-    #ysize gui.textbox_height
+    yminimum gui.textbox_height
 
     background Frame("gui/frame.png", xalign=0.5, yalign=1.0, yoffset=-25)
 

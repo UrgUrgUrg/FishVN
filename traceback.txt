@@ -1,26 +1,72 @@
 ﻿I'm sorry, but an uncaught exception occurred.
 
 While running game code:
-  File "game/Character Scripts/Character_Template.rpy", line 1, in script
-    init python:
-  File "game/Character Scripts/Character_Template.rpy", line 27, in <module>
-    characters.append(Lophi)
-NameError: name 'characters' is not defined
+  File "game/minigame.rpy", line 351, in script
+    call screen gift_select(playersLures.gifts,True)
+  File "renpy/common/000statements.rpy", line 671, in execute_call_screen
+    store._return = renpy.call_screen(name, *args, **kwargs)
+  File "game/Shops.rpy", line 292, in execute
+    screen gift_select(inventoryToUse=giftshopItems.gifts,isGiving=False):
+  File "game/Shops.rpy", line 292, in execute
+    screen gift_select(inventoryToUse=giftshopItems.gifts,isGiving=False):
+  File "game/Shops.rpy", line 293, in execute
+    default inventory = countDuplicates(inventoryToUse)
+  File "game/Shops.rpy", line 293, in <module>
+    default inventory = countDuplicates(inventoryToUse)
+  File "game/Shops.rpy", line 290, in countDuplicates
+    return set(new_list)
+TypeError: unhashable type: 'RevertableList'
 
 -- Full Traceback ------------------------------------------------------------
 
 Full traceback:
-  File "game/Character Scripts/Character_Template.rpy", line 1, in script
-    init python:
-  File "C:\Renpy\renpy-8.2.1-sdk\renpy\ast.py", line 823, in execute
-    renpy.python.py_exec_bytecode(self.code.bytecode, self.hide, store=self.store)
-  File "C:\Renpy\renpy-8.2.1-sdk\renpy\python.py", line 1178, in py_exec_bytecode
-    exec(bytecode, globals, locals)
-  File "game/Character Scripts/Character_Template.rpy", line 27, in <module>
-    characters.append(Lophi)
-NameError: name 'characters' is not defined
+  File "game/minigame.rpy", line 351, in script
+    call screen gift_select(playersLures.gifts,True)
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\ast.py", line 1968, in execute
+    self.call("execute")
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\ast.py", line 1950, in call
+    return renpy.statements.call(method, parsed, *args, **kwargs)
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\statements.py", line 349, in call
+    return method(parsed, *args, **kwargs)
+  File "renpy/common/000statements.rpy", line 671, in execute_call_screen
+    store._return = renpy.call_screen(name, *args, **kwargs)
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\exports.py", line 3413, in call_screen
+    rv = renpy.ui.interact(mouse="screen", type="screen", roll_forward=roll_forward)
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\ui.py", line 301, in interact
+    rv = renpy.game.interface.interact(roll_forward=roll_forward, **kwargs)
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\display\core.py", line 2165, in interact
+    repeat, rv = self.interact_core(preloads=preloads, trans_pause=trans_pause, pause=pause, pause_start=pause_start, pause_modal=pause_modal, **kwargs) # type: ignore
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\display\core.py", line 2687, in interact_core
+    root_widget.visit_all(lambda d : d.per_interact())
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\display\displayable.py", line 431, in visit_all
+    d.visit_all(callback, seen)
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\display\displayable.py", line 431, in visit_all
+    d.visit_all(callback, seen)
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\display\displayable.py", line 431, in visit_all
+    d.visit_all(callback, seen)
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\display\screen.py", line 480, in visit_all
+    callback(self)
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\display\core.py", line 2687, in <lambda>
+    root_widget.visit_all(lambda d : d.per_interact())
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\display\screen.py", line 491, in per_interact
+    self.update()
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\display\screen.py", line 697, in update
+    self.screen.function(**self.scope)
+  File "game/Shops.rpy", line 292, in execute
+    screen gift_select(inventoryToUse=giftshopItems.gifts,isGiving=False):
+  File "game/Shops.rpy", line 292, in execute
+    screen gift_select(inventoryToUse=giftshopItems.gifts,isGiving=False):
+  File "game/Shops.rpy", line 293, in execute
+    default inventory = countDuplicates(inventoryToUse)
+  File "game/Shops.rpy", line 293, in <module>
+    default inventory = countDuplicates(inventoryToUse)
+  File "game/Shops.rpy", line 290, in countDuplicates
+    return set(new_list)
+  File "C:\Renpy\renpy-8.2.1-sdk\renpy\revertable.py", line 420, in __init__
+    set.__init__(self, *args)
+TypeError: unhashable type: 'RevertableList'
 
 Windows-10-10.0.19045 AMD64
 Ren'Py 8.2.1.24030407
 FishLoveMe 0.0
-Sun May 19 17:14:04 2024
+Thu May 23 08:56:08 2024
