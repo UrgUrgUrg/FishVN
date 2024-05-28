@@ -85,9 +85,11 @@ default currentCharacter = currentCharacter
 default datingPool = datingPool
 default caughtToday = caughtToday
 
+default hooks = 1
+
 label start:
     show screen clock
-    $characters.remove(MyCoolFish) ##So we don't actually see the super barebones example character
+    $playersLures.upgrades.append(Rod)
     $playersLures.addItem(GraphicRasta)
     $playersLures.addItem(HulaGirl)
     $playersLures.addItem(Minnow)
@@ -234,7 +236,7 @@ label lakeside:
 
 
 screen lure_select(shop = False):
-    default activeButton = rememberLure
+    default activeButton = 0
     default lureList = playersLures.items
     on "show" action If(shop,SetScreenVariable("lureList",baitshopsLures.items),SetScreenVariable("lureList",playersLures.items))
     frame align (0.9,0.5) xysize (600,800) padding(30,30):

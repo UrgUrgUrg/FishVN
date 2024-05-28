@@ -2,9 +2,9 @@
 errors listed below, and try again.
 
 
-File "game/defs.rpy", line 180: invalid syntax
-    Costume Necklace = Gift("Pretty but might dissolve once submerged",["pretty","jewellery","shiny"],29.99)
-             ^
+File "game/Shops.rpy", line 490: expected a keyword argument, colon, or end of line.
+    textbutton "Buy Upgrade" "#7e7e7e" action NullAction()
+                             ^
 
 Ren'Py Version: Ren'Py 8.2.1.24030407
-Thu May 23 10:07:26 2024
+Fri May 24 15:55:57 2024

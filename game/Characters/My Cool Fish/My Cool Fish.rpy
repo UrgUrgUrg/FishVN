@@ -1,10 +1,14 @@
 init python:
-    MyCoolFish = Fish("My Cool Fish")
+    MyCoolFish = Fish("My Cool Fish",)
     ####  ^  A super barebones definition of a new character
 
 label My_Cool_Fish_Catch:
     "A cool fish appears"
     npc "Hello, I’m a cool fish"
+    return
+
+label My_Cool_Fish_Catch_revisit:
+    npc "We meet again. This is very special for you"
     return
 
 label My_Cool_Fish_Confession:

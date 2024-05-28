@@ -50,7 +50,7 @@ init -600 python:
     ## Defining a `Fish` class with name, weight, height, and price of the fish.
     ## Price of the fish is equivalent to the weight divided by 2 times the height
     class Fish:
-        def __init__(self, name, weight=160.00, height=5.2, description="This dumb fish isn't sexy AT ALL", dateable=True, max_affection=100, nameColor="#fff", lureTraits=["normal"], giftTraits=[], specialLure=None, commonality=1,negativeTraits=["crappy"],creator="",creatorUrl=""):
+        def __init__(self, name, weight=160.00, height=5.2, description="This dumb fish isn't sexy AT ALL", max_affection=100, nameColor="#fff", lureTraits=["normal"], giftTraits=["edible"], specialLure=None, commonality=1,negativeTraits=["crappy"],creator="",creatorUrl="",dateable=True,):
             global characters
             self.name = name
             if (dateable):
@@ -127,7 +127,7 @@ init -600 python:
             baseGifts.append(self)
 
     class Upgrade:
-        def __init__(self, name, description="Fishing rod upgrade", price=0,requires=[]):
+        def __init__(self, name, description="Fishing rod upgrade", price=0,requires=None):
             self.name = name
             self.price = price
             self.description = description
@@ -195,16 +195,17 @@ init -600 python:
     
 
     #UPGRADES
-    Auto1 = Upgrade("Motorized Handle","This hands-free reeling solution lets you automatically catch any fish under 2lbs",40.00)
-    Auto2 = Upgrade("Gas-powered Motor","It's Environmentally unfriendly, yes but it's even more unfriendly to fish. Automatically catches anything lighter than 25lbs",60.00,[Auto1])
-    Auto3 = Upgrade("Overclocked Motor","It could explode at any moment, killing you instantly. But before it does that enjoy automatically catching anything lighter than 50lbs",80.00,[Auto1,Auto2])
-    Hook1 = Upgrade("Extra hook","Attatch more hooks to your rod - more hooks means more fish caught in less time (though the hauls will be heavier)",20.00)
-    Hook2 = Upgrade("Extra extra hook","It's just another hook - identical to the last one you bought so why it is more expensive? Blame inflation I guess", 30.00,[Hook1])
-    Hook3 = Upgrade("Frankly Unnecessary Extra Hook","At this point you just need to admit it: You're hooked on hooks and willing to pay any price for your next fix", 45.00,[Hook1,Hook2])
-    Line1 = Upgrade("Reinforced line","Good news: this extra thick line means far less breakages. Bad news: Your remake of The Tingler will have to go on hiatus.", 25.00,[])
-    Line2 = Upgrade("Unbreakable line","Say GOODBYE to lose states FOR GOOD. It's like you don't even care about the effort put into coding that 'your line broke' screen!",50.00,[Line1])
-    Auto4 = Upgrade("Nuclear Fishin' Core","Enough energy to power the whole island put to far better use as a means to automatically catch any haul under 100lbs. The power! THE POWER!",120.00,[Line1,Hook1,Auto1,Auto2,Auto3])
-
+    Rod = Upgrade("Fishing Rod","Your trusty rod",0.00)
+    Auto1 = Upgrade("Motorized Handle","This hands-free reeling solution increases your reeling power lets you automatically win on any catch under 2lbs",40.00,Rod)
+    Auto2 = Upgrade("Gas-powered Motor","It's Environmentally unfriendly, yes but it's even more unfriendly to fish. Increases your reelking power and automatically catches anything lighter than 25lbs",60.00,Auto1)
+    Auto3 = Upgrade("Overclocked Motor","It could explode at any moment, killing you instantly. But before it does that enjoy the extra reeling power and automatically catching anything lighter than 50lbs",80.00,Auto2)
+    Hook1 = Upgrade("Extra hook","Attatch more hooks to your rod - more hooks means more fish caught in less time (though the hauls will be heavier)",20.00,Rod)
+    Hook2 = Upgrade("Extra extra hook","It's just another hook - identical to the last one you bought so why it is more expensive? Blame inflation I guess", 30.00,Hook1)
+    Hook3 = Upgrade("Frankly Unnecessary Extra Hook","At this point you just need to admit it: You're hooked on hooks and willing to pay any price for your next fix", 45.00,Hook2)
+    Line1 = Upgrade("Reinforced line","Good news: this extra thick line means far less breakages. Bad news: Your remake of The Tingler will have to go on hiatus.", 25.00, Rod)
+    Line2 = Upgrade("Unbreakable line","Say GOODBYE to lose states FOR GOOD. It's like you don't even care about the effort put into coding that 'your line broke' screen!",50.00,Line1)
+    Auto4 = Upgrade("Nuclear Fishin' Core","Enough energy to power the whole island put to far better use as a means to increase your reeling power and automatically catch any haul under 100lbs. The power! THE POWER!",120.00,Auto3)
+    
     ## Method to generate a random fish from our 3 pools of possible fishes AND add it to our inventory in one go.
     ## To make a new fish, simply:
     ## `Fish(name="Fish Name", weight=round(renpy.random.uniform(2, 5), 2), height=renpy.random.randint(16, 28))`
@@ -248,6 +249,7 @@ init -600 python:
     playersLures.items = [Hook]
 
 init python:
+
     def characterCode(st,at):
         stringo=""
         if currentCharacter.dateable:

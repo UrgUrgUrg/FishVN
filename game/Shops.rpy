@@ -188,8 +188,12 @@ screen sell_fish(list_used):
                         button action Return(i):
                             frame:
                                 vbox:
-                                    add "Characters/JunkFish/[currentFish.name].png":
-                                        xysize (200,200)
+                                    if (renpy.loadable("Characters/JunkFish/[currentFish.name].png")):
+                                        add "Characters/JunkFish/[currentFish.name].png":
+                                            xysize (200,200)
+                                    else:
+                                        add "Characters/JunkFish/Banana Squid.png":
+                                            xysize (200,200)
                                     text "$[currentFish.price:.2f]" align(0.5,0.5)
         hbox xalign 0.5:
             if (list_used==playersLures.fish):
@@ -250,10 +254,7 @@ init python:
     def applyBulkDiscount(item,quantity):
         price = item.price
         fullPrice = (price*quantity)
-        if quantity>1:
-            reduction = max(0,quantity/100)
-        else:
-            reduction=0
+        reduction = max(0,(quantity/(maxQuantitySet))*0.4)
         totalCost = fullPrice - min(fullPrice*0.5, fullPrice*reduction)
         return round(min(fullPrice, totalCost),2)
 
@@ -293,6 +294,8 @@ init python:
                 new_list.append([i,count])
         return new_list
 
+default maxQuantitySet = 9
+
 screen gift_select(inventoryToUse=giftshopItems.gifts,isGiving=False):
     default inventory = countDuplicates(inventoryToUse)
     default currentHovered = inventory[0][0]
@@ -300,7 +303,7 @@ screen gift_select(inventoryToUse=giftshopItems.gifts,isGiving=False):
     default quantity = 1
     default totalCost = currentHovered.price
     default shoppingCart = []
-    default maxQuantity = 99
+    default maxQuantity = maxQuantitySet
     dismiss action Return(["horace"])
     hbox align (0.5, 0.5) spacing 10:
         viewport draggable True xysize(600,900) mousewheel True:
@@ -312,7 +315,7 @@ screen gift_select(inventoryToUse=giftshopItems.gifts,isGiving=False):
                         $inStock = "("+str(theCount)+")"
                     else:
                         $inStock=""
-                    button action SetScreenVariable("currentHovered", theItem), If(isGiving, SetScreenVariable("maxQuantity",theCount),SetScreenVariable("maxQuantity",100)),SetScreenVariable("quantity",1) hovered SetScreenVariable("currentHovverBovver",theItem):
+                    button action SetScreenVariable("currentHovered", theItem), If(isGiving, SetScreenVariable("maxQuantity",theCount),SetScreenVariable("maxQuantity",maxQuantitySet)),SetScreenVariable("quantity",1) hovered SetScreenVariable("currentHovverBovver",theItem):
                         fixed ysize 30:
                             frame xfill True:
                                 vbox:
@@ -384,10 +387,8 @@ label rodShop_menu:
     menu:
         "Upgrade your fishing rod":
             call screen rod_shop
-            if _return == -1:
-                pass
-            else:
-                $selectedUpgrade = rodShopItems.upgrades[_return]
+            if _return != -1:
+                $selectedUpgrade = _return
                 $playersLures.coins = playersLures.coins - selectedUpgrade.price
                 $rodShopItems.coins = rodShopItems.coins + selectedUpgrade.price
                 $playersLures.upgrades.append(selectedUpgrade)
@@ -397,6 +398,35 @@ label rodShop_menu:
                 $advanceHours(1)
                 play sound "victory.ogg"
                 "After an hour or so's wait - you have your new upgrade!"
+                if (selectedUpgrade == Auto1):
+                    $reel_upgrade=1
+                    $reel_upgrade_multiply=2.0
+                    $fish_weight_limit = 2.0
+                elif (selectedUpgrade == Auto2):
+                    $reel_upgrade=2
+                    $reel_upgrade_multiply=3.2
+                    $fish_weight_limit = 25.0
+                    "It was Auto2"
+                elif (selectedUpgrade == Auto3):
+                    $reel_upgrade=3
+                    $reel_upgrade_multiply=5.5
+                    $fish_weight_limit = 50.0
+                elif (selectedUpgrade == Auto4):
+                    $reel_upgrade=4
+                    $reel_upgrade_multiply=7.0
+                    $fish_weight_limit = 100.0
+                elif (selectedUpgrade == Hook1):
+                    $hooks = 2
+                elif (selectedUpgrade == Hook2):
+                    $hooks = 3
+                elif (selectedUpgrade == Hook3):
+                    $hooks = 4
+                elif (selectedUpgrade == Line1):
+                    $line_upgrade=1
+                    $line_upgrade_multiply = 2.0
+                elif (selectedUpgrade == Line2):
+                    $line_upgrade=2
+                    $line_upgrade_multiply = 99.0
             jump rodShop_menu
         "Leave":
             show rodShop
@@ -424,36 +454,37 @@ label rodney_fix:
 
 
 screen rod_shop:
-    default selectedUpgrade = -1
+    default selectedUpgrade = None
+    default hoveredUpgrade = None
     frame align (0.5,0.5) xysize (1200,750) padding (20,10):
         hbox xalign 0.5:
             vbox yalign 0.5:
                 text "Rodney's Rod Upgrades"
                 null height 25
-                for i, numeral index numeral in enumerate(rodShopItems.upgrades):
-                    button hovered SetScreenVariable("selectedUpgrade", i) action SetScreenVariable("selectedUpgrade",i):
+                for i in list(rodShopItems.upgrades):
+                    button action If(not i.requires in list(playersLures.upgrades),NullAction(),SetScreenVariable("selectedUpgrade",i)) hovered SetScreenVariable("hoveredUpgrade", i):
                         if (selectedUpgrade==i):
-                            text "[rodShopItems.upgrades[i].name] - {b}$[rodShopItems.upgrades[i].price:.2f]{/b}" color "#ffffff" size 20
+                            text "[i.name] - {b}$[i.price:.2f]{/b}" color "#eeff00" size 20
+                        elif (hoveredUpgrade==i):
+                            if (i.requires in list(playersLures.upgrades)):
+                                text "[i.name] - {b}$[i.price:.2f]{/b}\n{color=#eeff00}REQUIRES: [i.requires.name]{/c}" color "#ffffff" size 20
+                            else:
+                                text "[i.name] - {b}$[i.price:.2f]{/b}\n{color=#e01c1c}REQUIRES: [i.requires.name]{/c}" color "#7e7e7e" size 20
                         else:
-                            text "[rodShopItems.upgrades[i].name] - $[rodShopItems.upgrades[i].price:.2f]" color "#45f04d" size 20
+                            text "[i.name] - $[i.price:.2f]" color "#45f04d" size 20
+                if (selectedUpgrade!=None):
+                        if (playersLures.coins >= selectedUpgrade.price):
+                            textbutton "Buy [selectedUpgrade.name]" action Return(selectedUpgrade)
+                        else:
+                            textbutton "Buy [selectedUpgrade.name]" action NullAction()
+                textbutton "Exit" action Return(-1)
             vbox:
                 add "Interface/rod/RodSpin0.png" align (0.5,0.5) at rod_spinning
-                if (selectedUpgrade > -1):
+                if (hoveredUpgrade != None):
                     viewport xysize(500,75) draggable True mousewheel True:
                         vbox:
-                            text "[rodShopItems.upgrades[selectedUpgrade].description]" size 15
-                            text "REQUIRES:" size 18
-                            for y, numeral index numeral in enumerate(rodShopItems.upgrades[selectedUpgrade].requires):
-                                if (rodShopItems.upgrades[selectedUpgrade].requires[y] in list(playersLures.upgrades)):
-                                    text "[rodShopItems.upgrades[selectedUpgrade].requires[y].name]" color "#45f04d" size 13
-                                else:
-                                    text "[rodShopItems.upgrades[selectedUpgrade].requires[y].name]" color "#c70b0b" size 13
-                    hbox xalign 0.5:
-                        if (playersLures.coins >= rodShopItems.upgrades[selectedUpgrade].price):
-                            textbutton "Buy Upgrade" action Return(selectedUpgrade)
-                        else:
-                            textbutton "Buy Upgrade"
-                        textbutton "Exit" action Return(-1)
+                            text "[hoveredUpgrade.description]" size 15
+
 
 transform rod_spinning:
     "Interface/rod/RodSpin0.png"

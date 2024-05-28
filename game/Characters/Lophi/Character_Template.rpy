@@ -11,7 +11,8 @@ init python:
         height=5.7,
             ## ^ height and weight slightly contribute to their difficulty in the fishing game 
         max_affection=100,
-            ## ^ how much accumulated gift value the player will need to invest to unlock the 'Confession' scene
+            ## ^ how much accumulated gift value the player will need to invest to unlock the 'Confession' scene. It pretty much one-to-one translate
+            ##to how many dollars you spent because these fish are materialistic
         lureTraits = ["normal","horny","cool"],
             ## ^ Traits that a lure can have that will attract this character - take out 'normal' to make them more rewarding to discover
         giftTraits = ["edible","sentimental"],
@@ -79,7 +80,7 @@ label Lophi_Talk:
     return
 
 label Lophi_Talk_revisit:
-    call label_lophiConvo
+    call lophi_convo
     return
 
 label Lophi_AcceptGift:
@@ -117,7 +118,7 @@ label Lophi_Confession:
             npc "I'm so glad we made this official, boo. You are the greatest motherfuckin' thing in my goddamn life - You know that."
             npc "Oh my God, I can't stop blushing. I need to get back in the water and cool my ass off."
             npc "And you'll be here when I come back, right? Aw fuck it, you've got our special lure. Just call me up whenever, baby"
-            npc "(I just called [playername] 'baby' what the fuck? What the FUCK, Lophi)"
+            npc "(I just called [playerName] 'baby' what the fuck? What the FUCK, Lophi)"
 
 ## The below scenes will only play if the player has increased Lophi's affection to 10
 ## or more

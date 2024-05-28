@@ -91,8 +91,14 @@ transform struggle:
     ease 0.4 rotate -80*distance
     ease 0.2 rotate 0
     repeat
-      
 
+
+default reel_upgrade = 0
+default reel_upgrade_multiply = 1.0
+default line_upgrade = 0
+default line_upgrade_multiply = 1.0
+default fish_weight_limit = 0.0
+      
 screen minigame:
     #variables
     modal True
@@ -100,55 +106,63 @@ screen minigame:
     default reversal = False
     default fishEnergy = 100.0
     default allowedDistance = 1300
-    default reelTimer = 0
+    default reelTimer = False
+    default fishOffset = 0
+    default reelMultiply = 0.33
+    default fishFlip = 1.0
     $fishingX = (renpy.get_mouse_pos()[0])
-    key "K_LEFT" action SetVariable("fishingX",fishingX - 1) 
-    key "K_RIGHT" action SetVariable("fishingX",fishingX + 1) 
+    key "K_LEFT" action SetVariable("fishingX",fishingX - 4) 
+    key "K_RIGHT" action SetVariable("fishingX",fishingX + 4) 
     on "show" action SetVariable("fishingTimer",0)
     on "show" action SetVariable("fishX",renpy.random.randint(900, 1020))
-    on "show" action SetVariable("fishDepth",min(2500 - currentCharacter.weight*2,1100.0 + (currentCharacter.weight)))
+    on "show" action SetVariable("fishDepth",min(2500 - fishWeight*2, 1100.0 + (fishWeight)))
     #graphics
     on "show" action Play("sound","SFX/HitWater.ogg"), Play("music","Reggae.ogg")
-    add DynamicDisplayable(characterCode) at struggle:
-        anchor(0.5,0.3)
-        xpos round(fishX)
-        ypos round(fishDepth)
-        xsize 200
-        ysize 200 
+    for i in list(fish_on_hook):
+        if i.dateable:
+            $stringo = "Characters/"+i.name+"/"+i.name+".png"
+        else:
+            $stringo = "Characters/Junkfish/"+i.name+".png"
+        add stringo at struggle:
+            anchor(0.5,0.3)
+            xpos round(fishX+fishOffset)
+            ypos round(fishDepth)
+            xsize 200
+            ysize 200
+            xzoom fishFlip
     add DynamicLine(fishingX, 5, fishX, max(5,fishDepth))
     add "Minigame/Rod.png" xpos fishingX at rodrot
-    text "Time: [fishingTimer] \n FishX: [fishX] FishDepth: [fishDepth]\n Tick: [tick] - [reversal]\n Distance: [distance]\n Fishenergy: [fishEnergy] Fish speed: [(fishSpeed+(fishEnergy*0.2))]"
+    text "            \nREEL POWER: [((100-fishEnergy)/100)*50] \n           FishDepth: [fishDepth]   Time: [fishingTimer] \n FishX: [fishX] \n Tick: [tick] - [reversal]\n Distance: [distance]\n Fishenergy: [fishEnergy] Fish speed: [(fishSpeed+(fishEnergy*0.2))]"
     #gameplay code
-    timer 0.1 action SetVariable("fishDepth", fishDepth+(fishWeight/15)) repeat True
+    timer 0.1 action SetVariable("fishDepth", fishDepth + min(25,(fishWeight/5))), SetScreenVariable("reelTimer",False) repeat True
     timer 0.4 action SetScreenVariable("allowedDistance",(max(30,fishDepth/2500)*1300)) repeat True
     button:
         xsize 1920
         ysize 1080
         keysym "K_SPACE"
-        action SetScreenVariable("reelTimer",5), Play("sound","SFX/Reeling.ogg")
-    timer 0.05 action If(reelTimer>0, SetVariable("fishDepth",max(0,fishDepth-25-(100-fishEnergy)))), SetScreenVariable("reelTimer",reelTimer-1) repeat True
+        action  SetVariable("fishDepth",fishDepth - max( 0.5, ((((100-fishEnergy)/100)*300)*reel_upgrade_multiply )*reelMultiply) ), Play("sound","SFX/Reeling.ogg")
     timer 0.05 action SetVariable("distance", ((math.dist( (fishingX,5),(fishX,5))) / allowedDistance)*1) repeat True
     timer 5.0 action IncrementVariable("fishingTimer", 1) repeat True
     $fishForce=(fishSpeed-(fishEnergy*0.2))
     timer 0.01 action If(reversal is True, SetVariable("fishX",max(max(0,fishingX-allowedDistance),fishX-fishForce)), SetVariable("fishX",min(min(1920,fishingX+allowedDistance),fishX+fishForce))) repeat True
     timer 1.0 action If(renpy.random.randint(0,1)==0,SetScreenVariable("reversal",False),SetScreenVariable("reversal", True)) repeat True
-    timer 0.01 action If((reversal==True and (fishX>fishingX)) or (reversal==False and (fishX<fishingX)),SetVariable("correctSide",True),SetVariable("correctSide", False)) repeat True
-    timer 0.01 action If(correctSide,SetScreenVariable("fishEnergy", max(0.0,fishEnergy - (11.0*distance))), SetScreenVariable("fishEnergy", min(100.0,fishEnergy + 0.25))) repeat True
+    timer 0.01 action If((reversal==False and (fishX>fishingX)) or (reversal==True and (fishX<fishingX)),SetVariable("correctSide",True),SetVariable("correctSide", False)), If (reversal,SetScreenVariable("fishFlip",-1.0),SetScreenVariable("fishFlip",1.0)) repeat True
+    timer 0.01 action If(correctSide,SetScreenVariable("fishEnergy", max(0.0,fishEnergy - (11.0*distance))), SetScreenVariable("fishEnergy", min(100.0,fishEnergy + 2))), If(correctSide,SetScreenVariable("reelMultiply",1.0),SetScreenVariable("reelMultiply",0.75)) repeat True
     bar:
         value AnimatedValue(value=fishEnergy, range=100, delay=0.1, old_value=None)
         xysize(1000, 50)
         align (0.5,0.6)
     text "LINE SLACK: [fishEnergy:.3f]%" align(0.5,0.6)
     bar:
-        value AnimatedValue(value=fishDepth, range = 2500, delay=0.1, old_value=None)
+        value AnimatedValue(value=fishDepth, range = 2500*line_upgrade_multiply, delay=0.1, old_value=None)
         bar_vertical True
         bar_invert True
         thumb "Minigame/fish.png"
         align(0.01,0.5)
-        ysize 1240
+        ysize 900
         xsize 40
         bottom_bar Solid("#e70c0c")
-    timer 0.5 action If(fishDepth>(2500),Show("failGame"),NullAction()) repeat True
+    timer 0.5 action If(fishDepth>(2500*line_upgrade_multiply),Show("failGame"),NullAction()) repeat True
     timer 0.5 action If(fishDepth<25,Show("winGame"),NullAction()) repeat True
     
 screen failGame:
@@ -161,6 +175,8 @@ screen failGame:
     ## Automatically hides the screen if the player doesn't click within 1.0 second.
     timer 2.0 action Hide("failGame"), Jump("justFailed")
 
+default aligns=[0.5,0.2,0.7,0.35,0.65,0.0,1.0,0.0,0.9]
+
 screen winGame:
     ## When this screen is shown, we hide our mini-game, because the player has already failed at this point! Also resets casting flag to False
     on "show" action Hide("minigame")
@@ -168,12 +184,19 @@ screen winGame:
     timer 1.5 action PauseAudio("music",False)
     ## Left click, space, and whatever button player uses to advance game will automatically hide the fail screen.
     ##dismiss action Hide("winGame")
-    add DynamicDisplayable(characterCode) at slowzoom:
-        size (500, 500)
-        align (0.5,0.0)
+    $fishnum=0
+    for i in list(fish_on_hook):
+        if i.dateable:
+            $stringo = "Characters/"+i.name+"/"+i.name+".png"
+        else:
+            $stringo = "Characters/Junkfish/"+i.name+".png"
+        add stringo at slowzoom:
+            size (500, 500)
+            align (aligns[fishnum],0.0)
+        $fishnum += 1
     text "Thou Hath Caught A Fishy" size 100 align(0.5, 0.5)
     ## Automatically hides the screen if the player doesn't click within 1.0 second.
-    timer 3.0 action Hide("winGame"), Jump("caught_character")
+    timer 3.0 action Hide("winGame"), Jump("character_queue")
 
 label fishing_start:
     if not datingPoolSet:
@@ -193,6 +216,33 @@ label fishing_start:
         $datingPoolSet=True
     jump fishing
 
+default autoAdd=False
+
+label character_queue:
+    $inventoryFish=[]
+    $inventoryFishString=""
+    if autoAdd:
+        python:
+            if (len(fish_on_hook))>1:
+                for i in list(fish_on_hook):
+                    if not i.dateable:
+                        playersLures.fish.append(i)
+                        fish_on_hook.remove(i)
+                        if (len(fish_on_hook<1)):
+                            inventoryFishString += (i.Name+", ")
+                        else:
+                            inventoryFishString += ("and " + i.Name)
+        "Added [inventoryFishString] to inventory."
+    if fish_on_hook:
+        $currentCharacter = fish_on_hook.pop()
+        $charName = currentCharacter.name
+        $currentExpression = ""
+        $currentStage = currentCharacter.stage  
+        jump caught_character
+    else:
+        jump fishing_menu
+   
+
 label justFailed:
     play music "fishing.ogg"
     $advanceMinutes(fishingTimer)
@@ -202,23 +252,38 @@ label justFailed:
         $datingPool.append(currentCharacter)
     jump fishing_menu
 
+default fish_on_hook = []
+
 label fishing:
     play sound "SFX/cast.ogg"
+    $autoCatch=False
     $advanceMinutes(10)
+    $fish_on_hook=[]
     if datingPool:
         python:
-            currentCharacter = datingPool.pop()
-            fishWeight = currentCharacter.weight
-            fishSpeed = max(3,currentCharacter.weight/20)
-            charName = currentCharacter.name
-            currentExpression = ""
-            currentStage = currentCharacter.stage
-        "You cast your line{w=0.2}.{w=0.2}.{w=0.3}.{w=0.3}.{w=0.4}.\nA bite!"
+            renpy.random.shuffle(datingPool)
+            fishSpeed = 0.0
+            fishWeight = 0.0
+            for i in range(hooks):
+                if datingPool:
+                    thisFish = datingPool.pop()
+                    fish_on_hook.append(thisFish)
+                    fishWeight += thisFish.weight
+                    fishSpeed += max(15,thisFish.height/2)
+        $currentCharacter = fish_on_hook[0]
+        if (len(fish_on_hook)>1):
+            "You cast your line{w=0.2}.{w=0.2}.{w=0.3}.{w=0.3}.{w=0.4}.\nMultiple bites!"
+        else:
+            "You cast your line{w=0.2}.{w=0.2}.{w=0.3}.{w=0.3}.{w=0.4}.\nA bite!"
     else:
         "You cast your line{w=0.2}.{w=0.2}.{w=0.3}.{w=0.3}.{w=0.4}.{w=0.4}.{w=0.4}.\nBut nothing else seems to be biting today. Maybe they're tired of this lure..."
-        jump fishing_menu 
+        jump fishing_menu
+    if (fishWeight <= fish_weight_limit):
+        $autoCatch=True     
     menu:
-        "This catch seems about [str(round(currentCharacter.weight))] lbs"
+        "This catch seems about [str(round(fishWeight))] lbs"
+        "AUTO-CATCH" if (autoCatch):
+            call screen winGame
         "Reel 'em in!":
             scene bg underwater
             with dissolve
@@ -237,7 +302,7 @@ transform throwback:
     linear 0.5 yoffset -700 xzoom 0.5 yzoom 0.5 rotate 700
     linear 1.0 yoffset -200 xzoom 0.0 yzoom 0.0 rotate 1300
 
-label findLabel(suffix):
+label findLabel(suffix=""):
     if (not currentCharacter.dateable):
         return
     $i = 0
@@ -295,7 +360,8 @@ label caught_character:
             $musicNum = affectionMusic[0]
         play music "affection_level_"+str(musicNum)+".ogg"
     else:
-        play music "normalfish.ogg"
+        if (renpy.music.get_playing(channel='music') != "normalfish.ogg"):
+            play music "normalfish.ogg"
     $advanceMinutes(fishingTimer)
     $currentCharacter.caughtTimes += 1
     $talkedTo=False
@@ -344,6 +410,7 @@ label catch_menu:
                     call findLabel("Talk")
                 else:
                     "You and [charName] chat for a while."
+                    $increase_affection(3)
                 jump catch_menu
             else:
                 jump blubtalk
@@ -353,7 +420,7 @@ label catch_menu:
             if _return!=["horace"]:
                 $giftsGiven = _return
                 $advanceHours(1)
-                $givenGift=True
+                #$givenGift=True
                 $renpy.random.shuffle(currentCharacter.giftTraits)
                 $giftAccepted=False
                 python:
@@ -374,7 +441,7 @@ label catch_menu:
             with easeoutbottom
             play sound "SFX/fishadd.ogg"
             $playersLures.fish.append(currentCharacter)
-            jump fishingMenu
+            jump character_queue
         "Throw [charName] back":
             jump end_converstion
 
@@ -408,7 +475,7 @@ label end_converstion:
     hide character
     with easeinbottom
     $currentCharacter=None
-    jump fishing_menu
+    jump character_queue
 
 default fish_responses = [
 "[charName] stares at you blankly",
