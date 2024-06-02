@@ -239,15 +239,19 @@ label gift_menu:
             jump town
 
 label sellgifts:
-    call get_total_fish_value(playersLures.gifts)
-    call screen sell_fish(playersLures.gifts)
-    if (_return==-1):
-        jump gift_menu
+    call screen gift_select(playersLures.gifts,True,True)
+    if _return!=["horace"]:
+        $advanceMinutes(10)
+        play sound "SFX/cash.ogg"
+        python:
+            itemsBought = _return
+            playersLures.coins += round((itemsBought[0].price * len(itemsBought))*0.45,2)
+            for i in itemsBought:
+                playersLures.gifts.remove(i)
+        "You sold [amountBought]x [itemsBought[0].name]"
+        jump sellgifts
     else:
-        $soldGift = playersLures.gifts[_return]
-        Giftshop "It's a shame you and this [soldGift.name] couldn't make things work."
-        Giftshop "I'll make sure it finds a good home."
-    jump gift_menu
+        jump gift_menu
 
 init python:
 
@@ -268,7 +272,7 @@ init python:
 
 
 label buygifts:
-    call screen gift_select
+    call screen gift_select()
     if _return!=["horace"]:
         $advanceMinutes(10)
         play sound "SFX/cash.ogg"
@@ -296,7 +300,7 @@ init python:
 
 default maxQuantitySet = 9
 
-screen gift_select(inventoryToUse=giftshopItems.gifts,isGiving=False):
+screen gift_select(inventoryToUse=giftshopItems.gifts,isGiving=False,isSelling=False):
     default inventory = countDuplicates(inventoryToUse)
     default currentHovered = inventory[0][0]
     default currentHovverBovver = inventory[0][0]
@@ -304,12 +308,16 @@ screen gift_select(inventoryToUse=giftshopItems.gifts,isGiving=False):
     default totalCost = currentHovered.price
     default shoppingCart = []
     default maxQuantity = maxQuantitySet
-    dismiss action Return(["horace"])
+    dismiss action Return(["horace"]) 
     hbox align (0.5, 0.5) spacing 10:
         viewport draggable True xysize(600,900) mousewheel True:
             vbox spacing 13:
                 for i in list(inventory):
                     $theItem = i[0]
+                    if (theItem.alt_names != []):
+                        $itemName = renpy.random.choice(list(theItem.alt_names))
+                    else:
+                        $itemName = theItem.name
                     $theCount = i[1]
                     if (isGiving):
                         $inStock = "("+str(theCount)+")"
@@ -320,9 +328,9 @@ screen gift_select(inventoryToUse=giftshopItems.gifts,isGiving=False):
                             frame xfill True:
                                 vbox:
                                     if (currentHovered==theItem):
-                                        text "[theItem.name] - $[theItem.price] [inStock]" size 25 color "#dfdc2b"
+                                        text "[itemName] - $[theItem.price] [inStock]" size 25 color "#dfdc2b"
                                     else:
-                                        text "[theItem.name] - $[theItem.price] [inStock]" size 20 color "#fff"
+                                        text "[itemName] - $[theItem.price] [inStock]" size 20 color "#fff"
                                     if (currentHovverBovver==theItem):
                                         hbox spacing 3:
                                             for y in list(theItem.traits):
@@ -345,16 +353,23 @@ screen gift_select(inventoryToUse=giftshopItems.gifts,isGiving=False):
                 vbox spacing 15:
                     fixed ysize 40:
                         bar value ScreenVariableValue('quantity',maxQuantity,action=SetScreenVariable('totalCost',applyBulkDiscount(currentHovered,quantity)))
-                        if (quantity>3) and (not isGiving):
+                        if isSelling:
+                            text "$[totalCost*0.45:.2f]" xalign 0.5
+                        elif (quantity>3) and (not isGiving):
                             text "{s}{size=12}{color=#d62727}$[currentHovered.price*quantity:.2f]{/color}{/size}{/s} $[totalCost:.2f]" xalign 0.5
                         else:
                             text "$[totalCost:.2f]" xalign 0.5
-                    if (quantity>3) and (not isGiving):
-                        $perc = 100 - round((totalCost/(currentHovered.price*quantity))*100)
-                        if (perc>0):
-                            text "Bulk Discount: -[perc]%" size 15 xalign 0.5
+                    if not isSelling:
+                        if (quantity>3) and (not isGiving):
+                            $perc = 100 - round((totalCost/(currentHovered.price*quantity))*100)
+                            if (perc>0):
+                                text "Bulk Discount: -[perc]%" size 15 xalign 0.5
                     vbox xalign 0.5:
-                        if (totalCost <= playersLures.coins):
+                        if (isSelling):
+                            button action Return(itemsInCart(currentHovered,quantity)) xalign(0.5):
+                                frame:
+                                    text "Sell x [quantity] [currentHovered.name]"
+                        elif (totalCost <= playersLures.coins):
                             button action Return(itemsInCart(currentHovered,quantity)) xalign(0.5):
                                 frame:
                                     if isGiving:
@@ -366,11 +381,6 @@ screen gift_select(inventoryToUse=giftshopItems.gifts,isGiving=False):
                         button action Return(["horace"]) xalign 0.5:
                                 frame:
                                     text "Exit"
-                        
-
-
-
-
 
 default rodneyfixrod=False
 

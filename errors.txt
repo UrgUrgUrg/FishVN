@@ -2,9 +2,8 @@
 errors listed below, and try again.
 
 
-File "game/Shops.rpy", line 490: expected a keyword argument, colon, or end of line.
-    textbutton "Buy Upgrade" "#7e7e7e" action NullAction()
-                             ^
+File "game/defs.rpy", line 116: EOL while scanning string literal
+                self.image = "images/Lures/minnow".png"
 
 Ren'Py Version: Ren'Py 8.2.1.24030407
-Fri May 24 15:55:57 2024
+Sun Jun  2 19:58:08 2024

@@ -24,7 +24,7 @@ init python:
             ## ^ Bio info about you
     )
     
-    #characters = [Lophi]
+    characters = [Lophi]
         ### ^ Uncomment the code above to make lophi the game's ONLY character - this will be super helpful for testing!
 
 default lophiGotFat=False
@@ -69,11 +69,13 @@ label Lophi_Talk:
     npc "Seriously motherfucker - Whatchu DOIN'?"
     menu:
         "Damn girl, you're thicker than the Mariana Trench":
+            $setExpression("blush")
             "The lantern above the creature's head glows a vibrant pink"
             npc "Sh-shut the fuck up, ho. You don't know what your bitch-ass is talking about"
             $increase_affection(5)
             ## above is a function for increasing this character's affection towards the player - make sure to only
             ## use in a part of the label that only triggers once
+            $clearExpression()
         "Just catching fish!":
             npc "Catching... OH. Oh that's fucking cute. You think you CAUGHT me. Nuh UH, holmes. Nope. I only came up here to see what was up, I could have got away from your bitch-ass little string on a stick any time."
     call lophi_convo
@@ -107,18 +109,23 @@ label Lophi_Confession:
     npc "Hey... look..."
     npc "I'm sorry I was frontin' wichu before. I don't really trust new people that easily."
     npc "Especially not you surface-dwellin' types who generally wanna eat me or study me or melt my ass into a soap bar or yell out jokes about Ohio to me that, straight up, I do not get!! And will not look up context for!!"
+    $setExpression("happy")
     npc "But, I really like hanging wichu... Like a lot. You ain't scared of me, you don't pity me... Hell, you act like I'm doin' YOU a favor lettin' me sit here eating your shrimp and bitching..."
     npc "What I'm tryna say is... I wanna be real wichu. I don't want these talks to stop... Like, ever? I don't think I actaully wanna be more than a fathom away from your mammaly-ass, nasty-ass toenail-havin' feet ever again..."
     npc "Can we... I dunno... \nMake that happen?"
     menu:
         "*kiss her*":
+            $setExpression("blush")
             npc "WOOOOAH!!!"
             npc "OH SHIT!!! OH FUCK!!"
             npc "Oh goddamn I didn't know if I'd be ready but I WAS READY"
+            $setExpression("happy")
             npc "I'm so glad we made this official, boo. You are the greatest motherfuckin' thing in my goddamn life - You know that."
             npc "Oh my God, I can't stop blushing. I need to get back in the water and cool my ass off."
             npc "And you'll be here when I come back, right? Aw fuck it, you've got our special lure. Just call me up whenever, baby"
             npc "(I just called [playerName] 'baby' what the fuck? What the FUCK, Lophi)"
+    $setStage(2)
+    return
 
 ## The below scenes will only play if the player has increased Lophi's affection to 10
 ## or more
@@ -132,7 +139,9 @@ label Lophi_Talk_10:
     call lophi_convo
 
 label Lophi_AcceptGift_10:
+    $setExpression("happy")
     npc "A'ight. You a suck-up but you cute with it."
+    $clearExpression()
     return
 
 ## The below scenes will only play if the player has increased Lophi's affection to 25
@@ -149,6 +158,12 @@ label Lophi_AcceptGift_25:
     $obtainSpecialLure()
     return
 
+label Lophi_AcceptGift_25_revisit:
+    $setExpression("happy")
+    npc "Hey thanks, holmes!"
+    $clearExpression
+    return
+
 label Lophi_RejectGift_25:
     npc "Aw c'mon holmes. You know my taste better'n that."
     return
@@ -156,6 +171,7 @@ label Lophi_RejectGift_25:
 label Lophi_Talk_25:
     npc "Yeah I guess I'm down to talk for a while."
     npc "You know - just to kill time for a while"
+    $setExpression("blush")
     npc "(not like this is a highlight of my day or nothing)"
     call lophi_convo
     return
@@ -179,6 +195,7 @@ label Lophi_Talk_50:
     return
 
 label Lophi_AcceptGift_50:
+    $setStage(1)
     npc "This pampering's starting to affect my damn waistline."
     $lophiGotFat=True
         ### ^  then set them like so
@@ -207,14 +224,17 @@ label Lophi_Catch_100:
     return
 
 label Lophi_Talk_100:
+    $setExpression("happy")
     npc "My brothers are STOKED to meet you, by the way. You ain't gonna tell them I'm secretly a mushy, gushy dork around you right?"
     call lophi_convo
 
 label Lophi_Talk_100_revisit:
+    $setExpression("happy")
     npc "Yeah you talk away, baby. I'ma just watch yo mouth go up and down and think about how it'd feel sucking my tailfin"
     call lophi_convo
 
 label Lophi_AcceptGift_100:
+    $setExpression("happy")
     npc "That's sweet of you, baby but next time save it for some other fish. I already like yo ass"
     return
 
@@ -236,7 +256,9 @@ label lophi_convo:
         "Tell me about yourself":
             if (affection_level<1):
                     ## ^ Alternative way of checking affection level
+                $setExpression("angry")
                 npc "Man, fuck you. Buy me dinner first."
+                $clearExpression()
             elif (affection_level<50):
                 npc "Well shit, since you've got me on the line and all... What does your ass wanna know?"
                 jump lophi_questions
@@ -248,6 +270,7 @@ label lophi_convo:
             npc "Shut up, dumbass."
             $increase_affection(10)
             $askedLophiAbout.append("complimentweight")
+            jump lophi_questions
         "*End conversation*":
             pass
     return
@@ -266,8 +289,11 @@ label lophi_questions:
         "What are your brother's names?" if 'family' in list(askedLophiAbout) and not 'brothernames' in list(askedLophiAbout):
             if (affection_level < 25):
                     ## ^ Alternative way of checking affection level
+                $setExpression("angry")
                 npc "Who wants to fucken know, Zuckerburg? Keep this shit between us!"
+                $clearExpression()
             else:
+                $setExpression("happy")
                 npc "Mychal, Perco and... sigh... Bullshit Artist Supreme. He... uh, chose his own name after he transitioned."
                 npc "That fool's OLDER than me if you can believe it (my ass sure can't sometimes)."
                 npc "Then Myc and Perk are the two babies, Myc was born with a buncha problems so Perk's super protective of him"
@@ -277,7 +303,9 @@ label lophi_questions:
                 $askedLophiAbout.append("brothernames")
             jump lophi_questions
         "Aren't anglerfish usually saltwater creatures?" if not 'freshwater' in list(askedLophiAbout):
+            $setExpression("angry")
             npc "My family moved! You got a problem with that?"
+            $clearExpression()
             npc "I dunno, the algae out here's meant to be good for my lil' brother's gill condition or some shit."
             npc "Gotta try this stuff out if it's for family, y'know."
             $askedLophiAbout.append("freshwater")

@@ -451,7 +451,8 @@ label gift_accept:
     "[charName] has accepted your gift"
     python:
         for g in list(giftsGiven):
-            playersLures.gifts.remove(g)
+            if (g in list(playersLures.gifts)):
+                playersLures.gifts.remove(g)
     $increase_affection(round(giftsGiven[0].price * len(giftsGiven)))
     $giftsGiven=[]
     jump catch_menu

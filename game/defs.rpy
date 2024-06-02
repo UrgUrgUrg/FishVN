@@ -111,7 +111,10 @@ init -600 python:
             self.description = description
             self.uses = uses
             self.traits = traits
-            self.image = "Lures/" + self.name + ".png"
+            if not (renpy.loadable(self.name + ".png")):
+                self.image = "images/Lures/minnow.png"
+            else:
+                self.image = "images/Lures/" + self.name + ".png"
             baseLures.append(self)
 
     baseGifts = []
@@ -190,8 +193,10 @@ init -600 python:
     Console = Gift("Game Console","Okay so it's a knock-off product - but it's not like it's going to work underwater anyway! It's the gesture that counts!",["tech","media"],399.00,["Fintendo Switch","Breemdeck","Place-station 5","X-Lox"])
     Plushy = Gift("Plushy","A cute and cuddly lil so-and-so",["cute","soft"],15.99)
     Kitchenware = Gift("Kitchen Gadget","Just don't buy so many of these that you also end up needing a bigger kitchen",["homeware","tech","cooking"],104.78,["Air Fryer","Spiralizer","Coffee Machine","Bao Bun Steamer","Rice Cooker","Slow Cooker","Smoothie Maker","Mixer","Wine Fridge"])
-    CostumeNecklace = Gift("Costume Necklace","Pretty but might dissolve once submerged",["pretty","jewellery","shiny"],29.99)
+    CostumeNecklace = Gift("Costume Necklace","Pretty but might dissolve once submerged",["pretty","jewellery","shiny"], 29.99)
     DiamondNecklace = Gift("Diamond Necklace","An Eye-wateringly expensive extravagence.",["pretty","jewellery","shiny","valuable"], 3455.00)
+    ShrimpCocktail = Gift("Shrimp Cocktail","If they could only crack how to make these things alcoholic",["edible","seafood"], 19.99)
+    Burger = Gift("Juicy Burger","Beef is a luxury on this sea-locked island",["edible","meat","savory"],12.87,["Cheeseburger", "Bacon Burger","Juicy, juicy burger"])
     
 
     #UPGRADES
@@ -297,10 +302,10 @@ init python:
         currentCharacter.weight = currentCharacter.weight + number
 
     def lureCode(st,at):
-        if (currentLure):
+        if (currentLure) and (renpy.loadable(currentLure.image)):
             return currentLure.image, None
         else:
-            return "Lures/hook.jpg", None
+            return "Lures/Minnow.png", None
     
 transform expressionChange:
     yoffset 0.0

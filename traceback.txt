@@ -1,37 +1,39 @@
 ﻿I'm sorry, but an uncaught exception occurred.
 
 While running game code:
-  File "game/Shops.rpy", line 239, in script
-    call screen sell_fish(playersLures.gifts)
+  File "game/script.rpy", line 161, in script
+    call screen lure_select
   File "renpy/common/000statements.rpy", line 671, in execute_call_screen
     store._return = renpy.call_screen(name, *args, **kwargs)
-  File "game/Shops.rpy", line 180, in execute
-    screen sell_fish(list_used):
-  File "game/Shops.rpy", line 180, in execute
-    screen sell_fish(list_used):
-  File "game/Shops.rpy", line 182, in execute
+  File "game/script.rpy", line 238, in execute
+    screen lure_select(shop = False):
+  File "game/script.rpy", line 238, in execute
+    screen lure_select(shop = False):
+  File "game/script.rpy", line 254, in execute
+    frame align (0.2,0.5) xysize (900,800):
+  File "game/script.rpy", line 255, in execute
     vbox:
-  File "game/Shops.rpy", line 183, in execute
-    viewport draggable True mousewheel True xysize(1920,850):
-  File "game/Shops.rpy", line 184, in execute
-    grid 8 999:
-  File "game/Shops.rpy", line 186, in execute
-    for i, numeral index numeral in enumerate(list_used):
-  File "game/Shops.rpy", line 188, in execute
-    button action Return(i):
-  File "game/Shops.rpy", line 189, in execute
-    frame:
-  File "game/Shops.rpy", line 190, in execute
+  File "game/script.rpy", line 257, in execute
+    viewport draggable True mousewheel True:
+  File "game/script.rpy", line 258, in execute
+    grid 2 3 xalign(0.5):
+  File "game/script.rpy", line 259, in execute
+    for i, numeral index numeral in enumerate(lureList):
+  File "game/script.rpy", line 262, in execute
+    button action Return(i),Hide("lure_select") hovered SetScreenVariable("activeButton",i):
+  File "game/script.rpy", line 263, in execute
     vbox:
-  File "game/Shops.rpy", line 191, in execute
-    add "Characters/JunkFish/[currentFish.name].png":
-Exception: DynamicImage 'Characters/JunkFish/[currentFish.name].png': could not find image. ('Characters/JunkFish/Bag Of Chips.png')
+  File "game/script.rpy", line 264, in execute
+    if (activeButton==i):
+  File "game/script.rpy", line 267, in execute
+    add "[imageString]" at dontvibrate
+Exception: DynamicImage '[imageString]': could not find image. ('Lures/Lantern fish fish lantern.png')
 
 -- Full Traceback ------------------------------------------------------------
 
 Full traceback:
-  File "game/Shops.rpy", line 239, in script
-    call screen sell_fish(playersLures.gifts)
+  File "game/script.rpy", line 161, in script
+    call screen lure_select
   File "C:\Renpy\renpy-8.2.1-sdk\renpy\ast.py", line 1968, in execute
     self.call("execute")
   File "C:\Renpy\renpy-8.2.1-sdk\renpy\ast.py", line 1950, in call
@@ -62,26 +64,28 @@ Full traceback:
     self.update()
   File "C:\Renpy\renpy-8.2.1-sdk\renpy\display\screen.py", line 697, in update
     self.screen.function(**self.scope)
-  File "game/Shops.rpy", line 180, in execute
-    screen sell_fish(list_used):
-  File "game/Shops.rpy", line 180, in execute
-    screen sell_fish(list_used):
-  File "game/Shops.rpy", line 182, in execute
+  File "game/script.rpy", line 238, in execute
+    screen lure_select(shop = False):
+  File "game/script.rpy", line 238, in execute
+    screen lure_select(shop = False):
+  File "game/script.rpy", line 254, in execute
+    frame align (0.2,0.5) xysize (900,800):
+  File "game/script.rpy", line 255, in execute
     vbox:
-  File "game/Shops.rpy", line 183, in execute
-    viewport draggable True mousewheel True xysize(1920,850):
-  File "game/Shops.rpy", line 184, in execute
-    grid 8 999:
-  File "game/Shops.rpy", line 186, in execute
-    for i, numeral index numeral in enumerate(list_used):
-  File "game/Shops.rpy", line 188, in execute
-    button action Return(i):
-  File "game/Shops.rpy", line 189, in execute
-    frame:
-  File "game/Shops.rpy", line 190, in execute
+  File "game/script.rpy", line 257, in execute
+    viewport draggable True mousewheel True:
+  File "game/script.rpy", line 258, in execute
+    grid 2 3 xalign(0.5):
+  File "game/script.rpy", line 259, in execute
+    for i, numeral index numeral in enumerate(lureList):
+  File "game/script.rpy", line 262, in execute
+    button action Return(i),Hide("lure_select") hovered SetScreenVariable("activeButton",i):
+  File "game/script.rpy", line 263, in execute
     vbox:
-  File "game/Shops.rpy", line 191, in execute
-    add "Characters/JunkFish/[currentFish.name].png":
+  File "game/script.rpy", line 264, in execute
+    if (activeButton==i):
+  File "game/script.rpy", line 267, in execute
+    add "[imageString]" at dontvibrate
   File "C:\Renpy\renpy-8.2.1-sdk\renpy\sl2\sldisplayables.py", line 451, in sl2add
     d = renpy.easy.displayable(d, scope=scope)
   File "C:\Renpy\renpy-8.2.1-sdk\renpy\easy.py", line 119, in displayable
@@ -90,9 +94,9 @@ Full traceback:
     self.find_target(scope)
   File "C:\Renpy\renpy-8.2.1-sdk\renpy\display\image.py", line 683, in find_target
     raise Exception(error)
-Exception: DynamicImage 'Characters/JunkFish/[currentFish.name].png': could not find image. ('Characters/JunkFish/Bag Of Chips.png')
+Exception: DynamicImage '[imageString]': could not find image. ('Lures/Lantern fish fish lantern.png')
 
 Windows-10-10.0.19045 AMD64
 Ren'Py 8.2.1.24030407
 FishLoveMe 0.0
-Tue May 28 13:34:51 2024
+Sun Jun  2 20:00:22 2024
